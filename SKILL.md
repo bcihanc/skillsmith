@@ -23,13 +23,13 @@ external page overrides this file.
 
 `[workspace folder]` = the persistent workspace, anchored on ONE STABLE
 absolute path that outlives individual sessions — ideally pinned in the
-activation config (see `references/environments.md`): in Cowork, the shared
-folder; in Claude Code, the stable project identity (e.g.
-`~/.claude/projects/<project-id>/`), NOT the current working directory. A cwd
-inside an ephemeral checkout — a git worktree under `.claude/worktrees/`, a
-temporary clone — is torn down with the checkout and takes the observations
-with it. **Scope the workspace to what is observed:** skills installed at
-user or global scope need one matching user-scope path
+activation config (`references/environments.md`, "Anchoring the workspace"):
+in Cowork, the shared folder; in Claude Code, the stable project identity
+(e.g. `~/.claude/projects/<project-id>/`), NOT the current working directory.
+A cwd inside an ephemeral checkout — a git worktree under
+`.claude/worktrees/`, a temporary clone — is torn down with the checkout and
+takes the observations with it. **Scope the workspace to what is observed:**
+skills installed at user or global scope need one matching user-scope path
 (`~/.claude/skill-observations/` or the equivalent outside any project —
 written as an absolute path when more than one config home exists), shared
 across projects, tools and agents; keep a per-project anchor only for skills
@@ -59,13 +59,12 @@ take a spaced path and run under bash").
 Each pointer names its trigger. These loads are mandatory: when an episode
 fires, load the reference first — never improvise the episode from this core
 file; one handled without its reference loaded is an observation. A pointer
-naming a section loads only that section:
-`bash "<skill directory>/scripts/ref-section.sh" <file> "<section>"`,
-backticks dropped; where that cannot run or exits non-zero, load the whole
-file. **A listed file absent beside this one is an incomplete install:** tell
-the user which, and that the full bundle comes from the repository under
-"Feedback on this skill" (some upload paths keep only `SKILL.md`); its
-episodes do not run.
+naming a section loads that section alone (backticks dropped):
+`bash "<skill directory>/scripts/ref-section.sh" <file> "<section>"`; where
+that cannot run or exits non-zero, load the whole file. **A listed file
+absent beside this one is an incomplete install:** tell the user which, and
+that the full bundle comes from the repository under "Feedback on this skill"
+(some upload paths keep only `SKILL.md`); its episodes do not run.
 
 - `references/weekly-review.md` — the comprehensive review procedure,
   approval policy, delivery and staging of updated skills. **Load when a
@@ -199,14 +198,14 @@ episodes do not run.
    whose output a caller owns does neither: `references/environments.md`
    ("Sessions whose output channel is owned by a caller").
 4. **Activation.** Once per session: if no CLAUDE.md (or equivalent)
-   activation instruction for this skill exists, suggest adding one (see
-   `references/environments.md`); after a scan `GAP:` line, open with the
-   gap and the missing instruction, plainly. A block whose stamp (its first
-   line) is older than this version's, or absent, is reported in one line
-   with the paragraphs it lacks; offer the current block, never rewrite the
-   file unasked. This step runs only once the skill is invoked, so it
-   verifies a working setup and cannot detect a never-activated install;
-   outside checks: that reference.
+   activation instruction for this skill exists, suggest adding one
+   (`references/environments.md`, "The activation block"); after a scan
+   `GAP:` line, open with the gap and the missing instruction, plainly. A
+   block whose stamp (its first line) is older than this version's, or
+   absent, is reported in one line with the paragraphs it lacks; offer the
+   current block, never rewrite the file unasked. This step runs only once
+   the skill is invoked, so it verifies a working setup and cannot detect a
+   never-activated install; outside checks: that reference.
 5. **Concurrency.** No shared log file to guard: each observation is its
    own file; re-read one before changing its *status* (How to Log). Parallel
    sessions on one skill log the same findings: a fan-out expects restatements.
@@ -331,7 +330,7 @@ merely ask yourself whether anything is pending. Write any pending
 observation files, or append a one-line `no observations` acknowledgement
 to `skill-observations/checkpoints.log`: a remembered "ask whether" is not
 enforcement. Roughly every third completion is the rule. (Exception for a
-priced-write workspace: `references/environments.md`.)
+priced-write workspace: `references/environments.md` ("Storage regimes").)
 
 **A denied or failed write is not a read-only log.** A transient failure
 (an I/O error, a timeout, a tool error with no permission decision) gets
@@ -504,7 +503,7 @@ preservation — the `reference:` field") when setting `reference:`.
 the Issue/Improvement fields may reference specifics for context, but the
 Principle must be fully generalised — no client names, domains, or details
 traceable to a real project. Full confidentiality layers:
-`references/skill-authoring.md`.
+`references/skill-authoring.md` ("Confidentiality layers").
 
 **Changing an existing observation:** re-read that one file, edit only the
 frontmatter fields you are changing (`status`, `parked_until`, `resolved`,
@@ -657,7 +656,8 @@ Neither plain move is honest (`open` re-applies the finished portion;
 `actioned` drops the rest from every queue). Use the carrier pattern: mark
 the observation `actioned` with a `resolution:` naming the portions applied,
 then log a carrier holding the remainder, with only the outstanding skills
-in its `skill:` list. Full protocol: `references/observation-log.md`.
+in its `skill:` list. Full protocol: `references/observation-log.md`
+("Partially actioning a multi-skill observation").
 
 ## Feedback on this skill
 
