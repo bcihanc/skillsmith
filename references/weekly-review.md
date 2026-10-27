@@ -292,20 +292,22 @@ Escalate one decision per cluster (Step 3).
 
 ## Steps
 
-**Step 0 — recommend scheduled setup (fallback mode only).** Ordering
-guard: run Step 1's no-observations short-circuit FIRST — if there are no
-OPEN observations and no outstanding principles, skip Step 0 entirely and
-just update the timestamp. A brand-new install must never get a setup
-prompt before it has done any work. Next, read the activation config
-Step 1 reads (the instruction block in CLAUDE.md or its equivalent):
-where it says where reviews come from (a named routine, a schedule kept
-elsewhere, "only when I ask") or forbids autonomous runs, the user has
-already answered this step's question. Skip the offer, write no decline
-marker (it would record an answer the user never gave), and record the
-reason with the quoted line in `activation-tiers.txt`; offer again only
-when a later review finds that line changed or gone. Otherwise: check
-`skill-observations/scheduled-review-decline.txt`: if under 30 days old and
-the fallback isn't firing repeatedly, skip. Check for a registered
+### Step 0 — recommend scheduled setup (fallback mode only)
+
+Ordering guard: run Step 1's no-observations short-circuit FIRST — if
+there are no OPEN observations and no outstanding principles, skip Step
+0 entirely and just update the timestamp. A brand-new install must never
+get a setup prompt before it has done any work. Next, read the
+activation config Step 1 reads (the instruction block in CLAUDE.md or
+its equivalent): where it says where reviews come from (a named routine,
+a schedule kept elsewhere, "only when I ask") or forbids autonomous
+runs, the user has already answered this step's question. Skip the
+offer, write no decline marker (it would record an answer the user never
+gave), and record the reason with the quoted line in
+`activation-tiers.txt`; offer again only when a later review finds that
+line changed or gone. Otherwise: check
+`skill-observations/scheduled-review-decline.txt`: if under 30 days old
+and the fallback isn't firing repeatedly, skip. Check for a registered
 scheduled task (`skill-observations/scheduler-registered.txt`, or the
 platform's scheduler queried directly: `crontab -l` on Unix; `launchctl
 list` on macOS where launchd is used; `Get-ScheduledTask` in PowerShell
@@ -359,22 +361,24 @@ definition"). No → write today's date to
 firings within the window re-surface the offer). No scheduler available in
 this environment (per the definition above) → skip silently.
 
-**Step 1 — load.** First, the activation regression check — the one
-half of "is activation in place?" a review can reach: a review only runs
-when the skill loaded, so it cannot detect an install that never
-activated, but it can detect a tier that WAS in place and is no longer
-(a rewritten CLAUDE.md, a hooks file replaced by a settings sync). Read
-the activation config named in `references/environments.md` — the
-instruction block in CLAUDE.md or its equivalent, and the session-start
-hook where the harness has one — and if a tier that a previous review
-recorded as present is missing, say so in the summary's first line and
-re-suggest the block; record the tiers found in
-`skill-observations/activation-tiers.txt` so the next review has a
-baseline to compare against — in an aggregate run over several logs,
-one such file per participating workspace, describing that workspace's
-own config, never a single copy at the anchor workspace. The baseline
-includes any review-source line Step 0 quoted: when it has changed or
-gone, say so, and Step 0's offer is due again at the next review.
+### Step 1 — load
+
+First, the activation regression check — the one half of "is activation
+in place?" a review can reach: a review only runs when the skill loaded,
+so it cannot detect an install that never activated, but it can detect a
+tier that WAS in place and is no longer (a rewritten CLAUDE.md, a hooks
+file replaced by a settings sync). Read the activation config named in
+`references/environments.md` — the instruction block in CLAUDE.md or its
+equivalent, and the session-start hook where the harness has one — and
+if a tier that a previous review recorded as present is missing, say so
+in the summary's first line and re-suggest the block; record the tiers
+found in `skill-observations/activation-tiers.txt` so the next review
+has a baseline to compare against — in an aggregate run over several
+logs, one such file per participating workspace, describing that
+workspace's own config, never a single copy at the anchor workspace. The
+baseline includes any review-source line Step 0 quoted: when it has
+changed or gone, say so, and Step 0's offer is due again at the next
+review.
 
 Two more reads belong to the same pass. **Does the pre-skill tier's line
 name the batch content, or only the probe?** Where a tier read before any
@@ -838,15 +842,16 @@ Also read all active cross-cutting principles. If there are no OPEN
 observations and no outstanding principles: report "no open observations
 or outstanding principles", update the timestamp, and stop.
 
-**Step 2 — inventory skills and classify each write target by whether
-an edit SURVIVES, not by whether it succeeds.** List all skills (system
-prompt `<available_skills>` or the skills directory) and put each into one
-of three categories. Project-level skill directories (a project's
-`.claude/skills/`, where the harness surfaces them) are listed and
-classified too, and a project skill that duplicates an account skill is
-named as such: two copies of one skill drift exactly like two copies of
-one rule, and an inventory that reads one surface never sees the other.
-The categories:
+### Step 2 — inventory skills and classify each write target
+
+**By whether an edit SURVIVES, not by whether it succeeds.** List all
+skills (system prompt `<available_skills>` or the skills directory) and
+put each into one of three categories. Project-level skill directories
+(a project's `.claude/skills/`, where the harness surfaces them) are
+listed and classified too, and a project skill that duplicates an
+account skill is named as such: two copies of one skill drift exactly
+like two copies of one rule, and an inventory that reads one surface
+never sees the other. The categories:
 
 | Category | Detection | Action |
 |---|---|---|
@@ -900,13 +905,15 @@ Step 7 summary under Log integrity ("N installed skills fail the
 validator: …"). A failing skill with no observations in the queue gets a
 one-line staging that fixes only the gate failure.
 
-**Step 3 — cross-check observations.** Evaluate every OPEN observation
-against every skill — not just the skills named in its `skill:` list;
-Principles often generalise. Build skill → [relevant observations], seeding
-it from the frontmatter: every entry in an observation's `skill:` list puts
-it in that skill's bucket (the first entry is primary), every entry in
-`proposes_skill:` puts it under a new-skill candidate of that name, and
-every entry in `target_file:` puts it under that file — a bucket the review
+### Step 3 — cross-check observations
+
+Evaluate every OPEN observation against every skill — not just the
+skills named in its `skill:` list; Principles often generalise. Build
+skill → [relevant observations], seeding it from the frontmatter: every
+entry in an observation's `skill:` list puts it in that skill's bucket
+(the first entry is primary), every entry in `proposes_skill:` puts it
+under a new-skill candidate of that name, and every entry in
+`target_file:` puts it under that file — a bucket the review
 applies to by the file's owner (Delivery, "Non-skill files are split by
 owner": written directly when the review owns it, staged as a patch when
 another process does), instead of remapping the entry onto the nearest
@@ -1053,7 +1060,8 @@ pointer exists on BOTH sides — relay it to that session directly, or
 surface it to the user as a handoff item. A one-way note leaves the entry
 pointing at a decision that may be settled without it.
 
-**Step 4 — cross-check principles, and audit the families for drift.**
+### Step 4 — cross-check principles, and audit the families for drift
+
 Flag every skill that doesn't yet comply with each active cross-cutting
 principle. A missing `skill-observations/cross-cutting-principles.md` is
 abnormal, not empty: Session Start step 1 creates it, and it is the one
@@ -1139,8 +1147,10 @@ negative control beside its hits — a vocabulary match such as a common
 verb over-clusters, one word carrying opposite rules in two skills — or
 the shortlist is noise with a confident count attached.
 
-**Step 5 — apply.** Begin with the copy, not the edit: for each skill
-with approved/non-escalated items,
+### Step 5 — apply
+
+Begin with the copy, not the edit: for each skill with
+approved/non-escalated items,
 
 **Verify an observation's factual claims against the live system before
 promoting them into a skill.** An observation records what one session
@@ -1704,24 +1714,26 @@ when two independent agents flag the same ambiguity, the brief is the
 defect, not the agents: fix the brief and re-issue rather than
 adjudicating the two outputs.
 
-**Step 6 — re-scan, then mark ACTIONED.** Before any status is written,
-re-enumerate `observation-log/` and compare the listing against the file
-list built at Step 1. The queue is a snapshot of a shared, append-only
-store, and every downstream count and consistency check in this procedure
-is computed against the queue rather than the directory — so a stale queue
-produces a summary that is coherent, confident and incomplete. Files in
-the new listing that were not in the Step 1 list arrived during the run:
-they are OPEN and were never triaged. Classify each rather than merely
-counting them: (a) it targets a skill whose staged copy from Step 5 is
-still open in this run → fold it in and action it (the common case, and
-the one where a miss costs most, because the next review's base is then
-a staged copy whose provenance nobody re-derived); (b) otherwise → leave
-it OPEN for the next review and list it under the "arrived during this
-run" line of the Step 7 summary. Never let the delta pass silently, and
-never infer it from an id counter — a number above the scan's maximum is
-a side effect, not a detection mechanism. The check is a line-oriented
-set difference against the Step 1 list, with both paths re-derived in
-this call and a count guard on the new listing:
+### Step 6 — re-scan, then mark ACTIONED
+
+Before any status is written, re-enumerate `observation-log/` and
+compare the listing against the file list built at Step 1. The queue is
+a snapshot of a shared, append-only store, and every downstream count
+and consistency check in this procedure is computed against the queue
+rather than the directory — so a stale queue produces a summary that is
+coherent, confident and incomplete. Files in the new listing that were
+not in the Step 1 list arrived during the run: they are OPEN and were
+never triaged. Classify each rather than merely counting them: (a) it
+targets a skill whose staged copy from Step 5 is still open in this run
+→ fold it in and action it (the common case, and the one where a miss
+costs most, because the next review's base is then a staged copy whose
+provenance nobody re-derived); (b) otherwise → leave it OPEN for the
+next review and list it under the "arrived during this run" line of the
+Step 7 summary. Never let the delta pass silently, and never infer it
+from an id counter — a number above the scan's maximum is a side effect,
+not a detection mechanism. The check is a line-oriented set difference
+against the Step 1 list, with both paths re-derived in this call and a
+count guard on the new listing:
 
 ```bash
 d="[ABSOLUTE PATH]/skill-observations/observation-log"
@@ -1764,14 +1776,16 @@ gated on it (files archive only when it's before today), so a dateless mark
 breaks the cross-session grace period. Do NOT archive same-session — the
 next write on a later day archives them.
 
-**Step 7 — deliver and summarise.** Stage updated skills (see Delivery
-below). Save the complete record under
-`[workspace folder]/skill-observations/reviews/[date]/REVIEW.md`, using the
-template below. In chat, report what changed and its verification, followed
-by at most three remaining next steps in the Step 3 format. Link the record
-for the full accounting. Distinguish proposed, staged and installed changes;
-an observation count alone is not an outcome. Records are kept: no step
-prunes `reviews/`, and old ones are the user's to delete.
+### Step 7 — deliver and summarise
+
+Stage updated skills (see Delivery below). Save the complete record
+under `[workspace folder]/skill-observations/reviews/[date]/REVIEW.md`,
+using the template below. In chat, report what changed and its
+verification, followed by at most three remaining next steps in the Step
+3 format. Link the record for the full accounting. Distinguish proposed,
+staged and installed changes; an observation count alone is not an
+outcome. Records are kept: no step prunes `reviews/`, and old ones are
+the user's to delete.
 
 Step 7 ends with the line **"N bundles staged, N bundles presented"**, and
 the run does not finish while the two numbers differ. A second line follows
@@ -1849,10 +1863,12 @@ reconciling the staged/presented count and writing the Step 8 timestamp;
 a step that blocks on an event that cannot occur turns the run's one
 deliverable into a hang.
 
-**Step 8 — timestamp.** Bound to the record: written only once Step 7's
-`reviews/[date]/REVIEW.md` exists and is non-empty, by one guarded command
-whose date is the one Step 7 saved the record under — never a fresh
-`date`, so a run crossing midnight does not fail its own guard:
+### Step 8 — timestamp
+
+Bound to the record: written only once Step 7's
+`reviews/[date]/REVIEW.md` exists and is non-empty, by one guarded
+command whose date is the one Step 7 saved the record under — never a
+fresh `date`, so a run crossing midnight does not fail its own guard:
 
 ```bash
 d="[DATE]"   # the [date] Step 7 saved the record under
