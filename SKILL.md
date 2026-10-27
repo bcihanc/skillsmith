@@ -142,9 +142,9 @@ skill" (some upload paths keep only `SKILL.md`); its episodes do not run.
    `scripts/`: a file the core names that is absent is reported in the same
    lines ("Reference files"), not at its first load.
 2. **Scan.** Read only the frontmatter of each file in `observation-log/`
-   — the header block between the first two `---` lines, never the bodies
-   — and build awareness from `status`, `skill`, `proposes_skill` and
-   `title`, and the active principles' headings, which the scan prints
+   — never the bodies. The scan prints one line per entry: its file name,
+   `status`, `skill`, `proposes_skill` and `title`; build awareness from
+   those and the active principles' headings, which it also prints
    (`principles=` in the checkpoint line). Hold them in awareness, don't
    surface unprompted. Frontmatter-only is the whole point of the per-file
    format: the scan stays cheap once hundreds of observations exist.

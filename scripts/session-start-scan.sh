@@ -19,8 +19,8 @@
 # pre-3.0 log.md sits beside the directory; a NOTE: pointer line when
 # skill-observations/MOVED.md exists; a GAP line when the previous scan in
 # checkpoints.log is 7 or more days old; the logs found under the root's
-# parent; the active principles' headings; then the frontmatter of every
-# numbered entry, each header followed by one `---` line; and LAST one
+# parent; the active principles' headings; then one line per numbered
+# entry, its file name and four header fields; and LAST one
 # `end of scan` line repeating the counts and how many finding lines
 # (NOTE / LOST ENTRIES / UNFILLED / SPLIT STORE / GAP) stand above the entries. The findings open the
 # output and the summary closes it, so a view cut by `head` keeps the
@@ -211,15 +211,25 @@ find "$(dirname "$root")" -maxdepth 3 -type d -path '*/skill-observations/observ
 # --- content: printed with the headers below ---------------------------------
 # The active principles' headings.
 [ -f "$p" ] && awk "$pa"' a && /^### / {sub(/\r$/, ""); print}' "$p"
-# The frontmatter of every numbered entry, one awk for the whole set over the
-# directory's own glob (no word splitting of a spaced path). This is the only
-# half a content classifier can refuse, so everything above has already run
-# when it is.
-( export LC_ALL=C; [ "$n" -eq 0 ] || { cd "$d" && awk 'FNR==1 && NR>1 && fm {print "---"}
-    FNR==1 {sub(/^\357\273\277/, ""); fm=/^---[[:space:]]*$/; if (!fm) {print "---"; nextfile}; next}
-    fm && /^---[[:space:]]*$/ {fm=0; print "---"; nextfile}
-    fm
-    END {if (fm) print "---"}' [0-9]*.md; } )
+# One line per numbered entry: its file name and the four header fields the
+# scan's readers use (SKILL.md, step 2), values as written, a block list's
+# items joined onto its key. The other fields and the bodies cost tokens in
+# every session and no reader of this print uses them. One awk for the whole
+# set over the directory's own glob (no word splitting of a spaced path). This
+# is the only half a content classifier can refuse, so everything above has
+# already run when it is.
+( export LC_ALL=C; [ "$n" -eq 0 ] || { cd "$d" && awk '
+    function flush(  s, i) {if (f == "") return; s = f
+      for (i = 1; i <= 4; i++) if (keys[i] in v) s = s " | " v[keys[i]]
+      print s; f = ""; split("", v)}
+    BEGIN {split("status skill proposes_skill title", keys, " ")}
+    FNR==1 {flush(); sub(/^\357\273\277/, ""); cur = ""; if (!/^---[[:space:]]*$/) nextfile; f = FILENAME; next}
+    {sub(/\r$/, "")}
+    /^---[[:space:]]*$/ {flush(); nextfile}
+    /^[A-Za-z_]+:/ {cur = $0; sub(/:.*/, "", cur); if (cur ~ /^(status|skill|proposes_skill|title)$/) v[cur] = $0; else cur = ""; next}
+    cur != "" && /^([[:space:]]|-([[:space:]]|$))/ {s = $0; sub(/^[[:space:]]+/, "", s); v[cur] = v[cur] " " s; next}
+    {cur = ""}
+    END {flush()}' [0-9]*.md; } )
 rc=$?
 
 # --- LAST: the end-of-scan line ----------------------------------------------

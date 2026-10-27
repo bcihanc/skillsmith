@@ -1201,6 +1201,12 @@ SCAN_FIXTURES = [
      "after reading the body: 0004-d.md (id: 5)", 1, "0002-b.md (id"),
     ("a pre-3.0 log.md beside the directory: SPLIT STORE with its count", "split", True, 0,
      "SPLIT STORE — log.md holds 2 observations not in observation-log/", 1, ""),
+    # The print costs tokens per entry in every session: one line of the four
+    # awareness fields, never the other header fields or the body.
+    ("an entry prints as one line of its awareness fields", "digest", True, 0,
+     '0002-b.md | status: open | skill: - alpha - beta | proposes_skill: - gamma | title: "digest"', 1,
+     "not printed"),
+    ("the body under a header is never printed", "digest", True, 0, "files: 2", 1, "body-text"),
 ]
 
 
@@ -1229,7 +1235,10 @@ def scan_case(scenario, pass_root):
                     # both id forms exist in live logs: padded and unpadded read as the prefix
                     "padded": [("0002-b.md", '---\nid: 0002\ntitle: "padded"\n---\n'),
                                ("0003-c.md", '---\nid: 3\ntitle: "plain"\n---\n'),
-                               ("0004-d.md", '---\nid: 5\ntitle: "wrong"\n---\n')]}
+                               ("0004-d.md", '---\nid: 5\ntitle: "wrong"\n---\n')],
+                    "digest": [("0002-b.md", '---\r\nid: 2\r\ntitle: "digest"\r\nstatus: open\r\n'
+                                'type: friction\r\nskill:\r\n  - alpha\r\n  - beta\r\nproposes_skill:\r\n- gamma\r\n'
+                                'area: "not printed"\r\n---\r\nstatus: body-text\r\n')]}
             for f, text in rest.get(scenario, [("0002-b.md", "---\nid: 2\ntitle: Fix: unquoted\n---\n")]):
                 (log / f).write_text(text, encoding="utf-8")
         if scenario == "moved":

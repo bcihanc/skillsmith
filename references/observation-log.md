@@ -381,11 +381,11 @@ token the harness exposes) the project.
 
 The final append is the session-start run's own trace (see "The scan ends
 in a write, not only a print"); a review's work-queue pass over the same
-frontmatter can drop it. The content print is one `awk` over `*.md`
-inside `( cd "$d" && … )`, never `for f in $(find …)` or `$(ls … | xargs
-…)` — both word-split a spaced path ("Snippets take a spaced path",
-above), while a glob in the directory hands `awk` bare names that nothing
-splits; one process for the whole set, not one per file.
+frontmatter can drop it. The content print, a line per entry, is one
+`awk` over `*.md` inside `( cd "$d" && … )`, never `for f in $(find …)`
+or `$(ls … | xargs …)` — both word-split a spaced path ("Snippets take a
+spaced path", above), while a glob in the directory hands `awk` bare
+names that nothing splits; one process for the whole set, not one per file.
 
 **Guard the read, not just the write.** A query that returns nothing is
 reporting on two possibilities at once — the data is absent, or the
@@ -1404,7 +1404,7 @@ at a specific moment needs its own entry in the tool record. (Where the
 workspace prices every write — the exception under "How to Log" — fold
 this line into the session's first write instead.) Read the scan's output
 whole. Its finding lines (NOTE, LOST ENTRIES, UNFILLED, GAP) and counts
-come first and the entry headers last, with one `end of scan` line closing
+come first and the entry lines last, with one `end of scan` line closing
 it that repeats the counts and the number of finding lines; `tail`, `head`
 or a `grep` hides exactly the lines that matter while the checkpoint line
 still lands and the log looks compliant. A truncated scan is a skipped one.
