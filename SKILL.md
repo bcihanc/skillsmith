@@ -378,7 +378,7 @@ id, not a separate duty (see Archival on Write):
 
 ```bash
 d="[ABSOLUTE PATH]/skill-observations/observation-log"   # the pinned workspace path, never relative to the cwd; it may contain a space, so keep it quoted; bash, not sh
-today=$(date +%F)          # archival rides inside this command (see below):
+[ -n "$BASH_VERSION" ] || { echo "ID COMMAND BROKEN — not bash: rerun under bash"; exit 1; }; today=$(date +%F)   # archival rides inside this command (see below):
 n_files=$(find "$d" -maxdepth 1 -name '[0-9]*.md' ! -empty | wc -l | tr -d ' ')   # a zero-byte file gives awk no line to count
 seen=$(cd "$d" && awk 'FNR==1 {n++; nextfile} END {print n+0}' [0-9]*.md 2>/dev/null)   # files the sweep's glob reaches, counted apart from the sweep
 [ "$n_files" -gt 0 ] && [ "${seen:-0}" -eq 0 ] && { echo "ARCHIVAL SWEEP BROKEN — $n_files files present, 0 examined"; exit 1; }
