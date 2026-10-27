@@ -1349,8 +1349,8 @@ def load_case(skill, absolute, scenario=""):
         else:
             log.mkdir(parents=True)
             ck.write_text("", encoding="utf-8")
-            for f, head, body in [("0001-a.md", "skill: [foo, bar]\nstatus: open", ""),
-                                  ("0002-b.md", "skill: [foo-extras]\nstatus: open", ""),
+            for f, head, body in [("0001-a.md", "skill: [foo, bar]\nstatus: open", "a-body-text\n"),
+                                  ("0002-b.md", "skill: [foo-extras]\nstatus: open", "b-body-text\n"),
                                   ("0003-c.md", "skill: foo\nstatus: actioned", ""),
                                   ("0004-d.md", "skill: [bar]\nstatus: open", "skill: foo\n"),
                                   ("0005-e.md", "skill: []\ntarget_file: [.claude/agents/reviewer.md]\nstatus: open", ""),
@@ -1598,6 +1598,14 @@ def selftest():
             bad += not ok; total += 1
             print(f"{'ok  ' if ok else 'FAIL'} skill-load script: {name}"
                   + ("" if ok else f" (exit {rc}, {ck} checkpoint lines, out {out!r})"))
+        # The load reads each open entry's body; the script prints them so the read
+        # is not a call per entry. A non-matching entry's body must stay out.
+        rc, out, ck = load_case("foo", True)
+        ok = rc == 0 and "\n===== 0001-a.md\n---\nid: 1\n" in out and "a-body-text" in out \
+            and "b-body-text" not in out and ck == 1
+        bad += not ok; total += 1
+        print(f"{'ok  ' if ok else 'FAIL'} skill-load script: each open match prints in full, others not"
+              + ("" if ok else f" (exit {rc}, {ck} checkpoint lines, out {out!r})"))
     elif shutil.which("bash"):
         bad += 1; total += 1
         print(f"FAIL skill-load script: {LOAD_SCRIPT.name} missing beside this file")

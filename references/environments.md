@@ -198,7 +198,7 @@ false record. Before writing to any file a skill reads at run time (a
 state file), load that skill: a state file that describes itself is not a
 substitute for the skill that owns it.
 
-Where scripts run, the lookup and its checkpoint line are one command:
+Where scripts run, the lookup, its checkpoint line and the bodies are one call:
   bash "<skill directory>/scripts/skill-load.sh" "[ABSOLUTE PATH]" <skill-name>
 The Skill invocation and that call are ONE batch — emit them together,
 one call per skill loaded, never the call in a later batch.

@@ -24,8 +24,9 @@
 #                     `reviewer.md`.
 #
 # Prints, on stdout: one line `<skill-name>: N open observations`, then the
-# matching file names, one per line (read their bodies next). Appends one
-# line to skill-observations/checkpoints.log:
+# matching file names, one per line, then each match in full under a
+# `===== <file>` line: the bodies the load must read, in this one call.
+# Appends one line to skill-observations/checkpoints.log:
 #   YYYY-MM-DD HH:MM loaded <skill-name> — N open observations
 #
 # Exit status:
@@ -138,4 +139,11 @@ printf '%s: %s open observations\n' "$name" "$count"
 
 printf '%s loaded %s — %s open observations\n' "$(date '+%F %H:%M')" "$name" "$count" \
   >> "$root/skill-observations/checkpoints.log"
+
+# The matches in full, after the record: this print is the only part a
+# content classifier can refuse, and by now the lookup and its checkpoint
+# line have landed. A refused print is not an empty result.
+[ -n "$matches" ] && printf '%s\n' "$matches" | while IFS= read -r m; do
+  printf '\n===== %s\n' "$m"; cat "$d/$m"
+done
 exit 0
