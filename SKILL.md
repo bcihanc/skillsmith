@@ -135,9 +135,10 @@ that the full bundle comes from the repository under "Feedback on this skill"
    and convert first) — never create them by hand. Then the **starter-set reconciliation**, due
    whenever `skill-observations/starter-principles-reviewed.txt` is absent
    or holds a starter-set version older than the one in
-   `references/starter-principles.md`. Load that file and follow its
-   **Reconciliation** section: match by substance, offer once in one line,
-   import only what the adopter picks, then — once answered — write the
+   `references/starter-principles.md`. Load
+   `references/starter-principles.md` ("Reconciliation") and follow it — it
+   says when the entries are read: match by substance, offer once in one
+   line, import only what the adopter picks, then — once answered — write the
    shipped version into the marker file; never pre-populate silently. Name the loaded skill's
    frontmatter `version:` in the start-up lines — read from the file, never
    fetched — and list the skill's own directory with its `references/` and
@@ -165,8 +166,7 @@ that the full bundle comes from the repository under "Feedback on this skill"
    bash "<skill directory>/scripts/session-start-scan.sh" "[ABSOLUTE PATH]"
    ```
 
-   `scripts/session-start-scan.sh` is the scan (in `<skill directory>`); review
-   it there, and read its output whole — never through `tail`, `head` or `grep`.
+   Read its output whole — never through `tail`, `head` or `grep`.
    In a bridged session where that directory is not on the device, run it from
    `skill-observations/.bin/` or a digest-matched staged copy — never a per-skill
    grep instead (`references/environments.md`, "Environment mappings", the

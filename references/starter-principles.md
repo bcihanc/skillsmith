@@ -24,10 +24,11 @@ a version lower than the `Starter set version` line above. That is true
 on a fresh install, on an existing install's first session after
 upgrading to a bundle that ships this file, and again whenever a later
 version grows the set. Never read it on an ordinary session start. The
-reconciliation compares by substance, not title: an adopter who already
-carries a rule under their own wording is covered, and only the uncovered
-entries are offered. Bump the version line whenever entries are added or
-materially changed, or existing installs never see the change.
+reconciliation compares by substance, not title, reading every entry
+below: an adopter who already carries a rule under their own wording is
+covered, and only the uncovered entries are offered. Bump the version
+line whenever entries are added or materially changed, or existing
+installs never see the change.
 
 **The offer is one line, made once:** "the bundle ships N starter
 principles; M are not covered by your file — want to see them?" On yes,
