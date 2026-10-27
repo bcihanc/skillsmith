@@ -29,6 +29,7 @@ Never run the skill checks on the repo root: the name and manifest checks fail t
 - Reference over its ceiling: trim, or raise it in `ceilings.txt` with a dated reason. A file with more than 12 `Load triggers:` cannot be raised; split it by episode (the check's `note:` line names such files).
 - `SKILL.md` over `core_max_lines`: move text to a reference first; a raise needs the commit/PR to say what pays for the lines.
 - A trim of 4+ lines also fails: lower that ceiling to the new count in the same commit.
+- The activation trigger (a multi-step task: three or more tool calls, a file write, or a plan) is stated in four places: the `SKILL.md` description, the activation block and the SessionStart hook message in `references/environments.md`, and the stop hook's `MIN_TOOL_USES` and write count there. Change them together.
 - A core pointer `references/x.md` ("Heading") loads only that section through `scripts/ref-section.sh`: from the heading to the next heading of its level or higher. A bold run-in label is not a boundary. The bundle check runs the script on every such pointer, so a renamed, duplicated or bold-only target heading fails the gate.
 - Contribution rules live in `CONTRIBUTING.md`: rewording keeps checkpoints, assertions and mandatory writes; new behaviour is declared; no runtime URL fetches; no real client or project names.
 - Publishing a GitHub release triggers `.github/workflows/release-bundle.yml`, which builds `skillsmith.skill`.
