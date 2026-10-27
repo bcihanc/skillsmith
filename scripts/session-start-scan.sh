@@ -7,7 +7,7 @@
 #
 #   [workspace-root]  the pinned absolute workspace path — the directory that
 #                     holds skill-observations/. Defaults to the environment
-#                     variable TASK_OBSERVER_WORKSPACE. One of the two is
+#                     variable SKILLSMITH_WORKSPACE. One of the two is
 #                     required; the log is never resolved from the cwd. The
 #                     path may contain spaces.
 #
@@ -52,10 +52,10 @@
 
 set -u
 
-root="${1:-${TASK_OBSERVER_WORKSPACE:-}}"
+root="${1:-${SKILLSMITH_WORKSPACE:-}}"
 
 if [ -z "$root" ]; then
-  echo "no workspace root: pass it as the first argument or set TASK_OBSERVER_WORKSPACE" >&2; exit 2
+  echo "no workspace root: pass it as the first argument or set SKILLSMITH_WORKSPACE" >&2; exit 2
 fi
 # A Windows drive path (C:/... or C:\...) is absolute there and is used as
 # given: Git Bash's find, awk and dirname accept it, and the paths the scan

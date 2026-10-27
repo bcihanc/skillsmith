@@ -248,7 +248,7 @@ clean log forever; a consumer on the other rule sees most of it fail to
 load (one log: 8 suspect by the shipped scan, 0 invalid under PyYAML, 127
 under Psych, all three right about the same corpus). So the rule is the
 intersection: **quote any list entry that contains a colon** — `skill:
-["superpowers:test-driven-development", task-observer]` — or use a block
+["superpowers:test-driven-development", skillsmith]` — or use a block
 list, where the colon is legal unquoted. `scripts/migrate-log.py` writes
 the quoted form; entries written by hand from the template are the ones
 to check.
@@ -292,7 +292,7 @@ For a skill the user does not maintain, the target artefact is the LOCAL
 INSTALL, not the upstream tree. An upstream report is not resolved when it
 is accepted, merged or released — none of those changes the copy that is
 running — and nothing observes a re-install. So the entry stays `parked`
-on a condition read from the installed copy ("the installed `task-observer`
+on a condition read from the installed copy ("the installed `skillsmith`
 carries rule X", or names the version that carries it), and is resolved
 when that copy carries the fix.
 
@@ -867,7 +867,7 @@ that meets the file mid-write reports it UNFILLED (a header with an empty
 and renames it into place, so the file holds the skeleton or the whole
 body, never a part, and a `NOTE:` on stderr names a body whose `id:` is
 not the one issued. It takes the pinned workspace root as its second
-argument or from `TASK_OBSERVER_WORKSPACE`, refuses a relative root, a
+argument or from `SKILLSMITH_WORKSPACE`, refuses a relative root, a
 malformed slug or a missing `observation-log/archive/` (halt and
 re-probe; never recreate from a writer), and prints the created path on
 stdout. Where it can run, it is the only write path: an id that exists

@@ -1,15 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
-  "name": "task-observer",
-  "displayName": "Task Observer — One Skill to Rule Them All",
+  "name": "skillsmith",
+  "displayName": "Skillsmith",
   "description": "Observes agent work sessions and turns recurring friction, corrections and judgement calls into proposed skill improvements and new skill candidates, with a human review gate.",
-  "version": "3.8.1",
+  "version": "4.0.0",
   "author": {
     "name": "Eoghan Henn",
     "url": "https://rebelytics.com"
   },
-  "homepage": "https://github.com/rebelytics/one-skill-to-rule-them-all",
-  "repository": "https://github.com/rebelytics/one-skill-to-rule-them-all",
+  "homepage": "https://github.com/bcihanc/skillsmith",
+  "repository": "https://github.com/bcihanc/skillsmith",
   "license": "CC-BY-4.0",
   "keywords": [
     "agent-skills",

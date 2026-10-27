@@ -1,8 +1,8 @@
-# task-observer - One Skill to Rule Them All
+# skillsmith
+
+A fork of [task-observer](https://github.com/rebelytics/one-skill-to-rule-them-all) by Eoghan Henn, renamed to skillsmith.
 
 ## The meta-skill that builds and improves all your skills, including itself.
-
-**Why "One Skill to Rule Them All"?** The slogan doesn't claim this is the best skill. It couldn't be: a meta-skill is useless without the skills it watches over. It describes what Task Observer does: keep an eye on how all your other skills are working and suggest improvements. You decide which changes are installed.
 
 This meta-skill has **logged over 1,900 observations across my 84 skills**, most of which were turned into skill improvements. The majority of my 84 skills were themselves created based on observations by the meta-skill.
 
@@ -14,16 +14,17 @@ This meta-skill is a practical application of the [Augmented Expertise](https://
 
 ## Quick install
 
-1. **Install it, by either route:**
-   - **From a terminal (Vercel's skills CLI, needs Node.js):** `npx skills add rebelytics/one-skill-to-rule-them-all --skill task-observer` — add `-g` to install it for all your projects. This is the most-used route: the skills.sh listing reports over 13,000 installs.
+1. **Install it, by any of these routes:**
+   - **From a terminal (Vercel's skills CLI, needs Node.js):** `npx skills add bcihanc/skillsmith --skill skillsmith` — add `-g` to install it for all your projects.
+   - **In Claude Code, as a plugin:** in a session, run `/plugin install skillsmith --marketplace bcihanc/skillsmith`, confirm adding the marketplace, then pick a scope (user scope installs it for all your projects). This one-command form needs Claude Code v2.1.275 or later; on older versions, run `/plugin marketplace add bcihanc/skillsmith` first, then `/plugin install skillsmith@skillsmith`.
    - **In the Claude apps (web, desktop, mobile, Cowork):** upload the `.skill` bundle from the latest release via Settings → Customize.
 2. **Activate it, whichever route you used:** add the activation instruction from `references/environments.md` to your CLAUDE.md (or your platform's equivalent), then check that it runs (see "Check that it actually runs" below). Installing alone is not enough, because description matching under-triggers.
 
-## Why you should use task-observer
+## Why you should use skillsmith
 
 Creating skills is powerful but time-consuming. The skills that do get built stay frozen: they never learn from how you actually use them.
 
-Task Observer fixes those problems. It's a meta-skill that runs alongside your work, watches what you do, and does two things:
+Skillsmith fixes those problems. It's a meta-skill that runs alongside your work, watches what you do, and does two things:
 
 1. **Identifies new skills for you** — it spots repeating patterns in your work and flags them as skill candidates, then helps you build them, so you get skills without staring at a blank page.
 2. **Improves your existing skills** — it notices corrections you make, preferences you express, and gaps in your current skills, then suggests specific updates.
@@ -32,13 +33,13 @@ You work normally. It watches. Your skill library grows and gets better over tim
 
 ## The self-improving part
 
-This is the detail that makes Task Observer truly beautiful in my opinion. Because it runs during every session and observes all active skills — including itself — it captures improvements to its own methodology over time.
+This is the detail that makes Skillsmith truly beautiful in my opinion. Because it runs during every session and observes all active skills — including itself — it captures improvements to its own methodology over time.
 
 If it misses something, or if its observation format could be clearer, or if it's triggering in contexts where it shouldn't — it notices, and it logs that too. The skill that improves all your skills also improves itself.
 
 ## What it does
 
-Task Observer monitors your work sessions and looks for three things:
+Skillsmith monitors your work sessions and looks for three things:
 
 1. **Corrections and adjustments** — if you adjust the AI's output or steer it in a different direction, that's a signal that a skill could be clearer or more complete
 2. **Gaps no skill covers yet** — if you're doing something manually or repeatedly that could be systematised, the observer flags it as a candidate for a new skill
@@ -54,11 +55,11 @@ The observer doesn't modify your installed skills. In an interactive review you 
 
 Claude Code Projects can write project memory on its own: when you correct a thread and tell Claude to remember the correction, it goes into that project's memory and later threads start with it. Those entries are notes the agent keeps to, scoped to one project, and they are deleted with the project.
 
-Task Observer does a different job, and the two work best together. **Scope:** project memory records a fact or a pitfall for *this* project; Task Observer turns recurring friction into a change to a reusable skill, which then carries into every project that loads that skill. **Control:** project memory is written automatically and applied as an instruction; a Task Observer observation is a proposal, and a human review sits between the observation and the rule it becomes. Nothing changes a skill until you install the staged update.
+Skillsmith does a different job, and the two work best together. **Scope:** project memory records a fact or a pitfall for *this* project; Skillsmith turns recurring friction into a change to a reusable skill, which then carries into every project that loads that skill. **Control:** project memory is written automatically and applied as an instruction; a Skillsmith observation is a proposal, and a human review sits between the observation and the rule it becomes. Nothing changes a skill until you install the staged update.
 
-The practical link: a pitfall you find yourself storing in project memory more than once, or in more than one project, is a Task Observer signal — it has stopped being about the project and started being about the skill.
+The practical link: a pitfall you find yourself storing in project memory more than once, or in more than one project, is a Skillsmith signal — it has stopped being about the project and started being about the skill.
 
-Claude Code's built-in `/insights` command is the other close neighbour. It generates a snapshot report on your recent sessions and suggests CLAUDE.md rules for instructions you keep repeating. That is a useful snapshot, but it keeps no running log of observations, does not maintain your existing skills, and leaves applying its suggestions to you. Task Observer works continuously, ties each observation to the skill it concerns and turns it into a reviewed update. The two combine well: a rule `/insights` suggests that belongs to a skill rather than a project is a good candidate for an observation.
+Claude Code's built-in `/insights` command is the other close neighbour. It generates a snapshot report on your recent sessions and suggests CLAUDE.md rules for instructions you keep repeating. That is a useful snapshot, but it keeps no running log of observations, does not maintain your existing skills, and leaves applying its suggestions to you. Skillsmith works continuously, ties each observation to the skill it concerns and turns it into a reviewed update. The two combine well: a rule `/insights` suggests that belongs to a skill rather than a project is a good candidate for an observation.
 
 ## Who it's for
 
@@ -66,7 +67,7 @@ You don't need to be a developer. If you use skills in any capacity and you want
 
 If you're a builder, you can easily integrate this skill, or even just the methodology, into your existing setup. Just point your agent at the repo and let it guide you towards the ideal implementation for your specific setup.
 
-The task observer is particularly valuable if you've built multiple skills and want a systematic way to maintain and improve them without manually auditing each one. It's also useful if you don't have any skills yet: the observer will start identifying skill candidates for you and help you build them.
+Skillsmith is particularly valuable if you've built multiple skills and want a systematic way to maintain and improve them without manually auditing each one. It's also useful if you don't have any skills yet: the observer will start identifying skill candidates for you and help you build them.
 
 One honest boundary: the formal observation log and review cycle pay off most as your skill library and usage grow — many skills, parallel sessions, scheduled reviews. If you run a small setup with a handful of skills, your AI system's built-in memory features may cover much of the same ground with less overhead, and editing a skill directly is quick. The observer's value compounds with scale: adopt it early if you expect your library to grow, or come back to it when direct editing stops feeling manageable.
 
@@ -82,7 +83,7 @@ The skill is a small bundle: `SKILL.md`, the files in `references/` that are loa
 
 **Claude (web interface, desktop app, mobile app, Cowork):** without the release bundle, put `SKILL.md`, `references/` and `scripts/` into one folder, zip that folder and upload it via Settings → Customize. The skill is then available in all chats and in Cowork tasks.
 
-**Claude Code:** place the folder at `.claude/skills/task-observer/` (project-level) or in your user-level skills directory, preserving the `references/` and `scripts/` subfolders.
+**Claude Code:** install it as a plugin with the commands under "Quick install", or place the folder at `.claude/skills/skillsmith/` (project-level) or in your user-level skills directory, preserving the `references/` and `scripts/` subfolders. If Claude Code then shows `Run /reload-plugins to activate`, run it.
 
 **Other systems:** keep the folder structure intact wherever your platform expects skills, and let your AI guide you (see "How it works" above).
 
@@ -123,7 +124,7 @@ If you try it in another environment, please let me know how it goes. Issues and
 
 ## Quick start
 
-1. Read the user guide at [https://github.com/rebelytics/one-skill-to-rule-them-all/blob/main/USER-GUIDE.md](https://github.com/rebelytics/one-skill-to-rule-them-all/blob/main/USER-GUIDE.md)
+1. Read the user guide at [https://github.com/bcihanc/skillsmith/blob/main/USER-GUIDE.md](https://github.com/bcihanc/skillsmith/blob/main/USER-GUIDE.md)
 2. Give the content of this repo (skill, readme and user guide) to the AI system of your choice and let it guide you towards the ideal configuration for your individual setup.
 3. Make sure that the skill loads in all sessions where it's needed (I solved this via an instruction in my CLAUDE.md file).
 4. Try to remember to ask "Any observations logged?" when you finish a session (I do this every time I archive a session). Sometimes, the skill then finds additional improvement potential that it didn't log before.
@@ -135,12 +136,12 @@ This is an open-source project for the community. If you use it, I would love to
 
 - **Bug reports and feature requests:** Open an issue or a pull request, whichever you prefer — you are credited either way. See [CONTRIBUTING.md](CONTRIBUTING.md) for how reports become changes and how credit works.
 - **Platform compatibility reports:** Tried it somewhere other than Claude? Tell me what happened.
-- **Interesting use cases:** Have you come up with a creative way of using or improving Task Observer?
+- **Interesting use cases:** Have you come up with a creative way of using or improving Skillsmith?
 - **Integrations with other systems:** One user told me that they connected task observer to Obsidian. Do you have a similar story?
 
 ## Support the project
 
-There is no donation button: the project is free and community-driven, and the help it needs is reach. If you know someone who would benefit from Task Observer, tell them; if you have an audience, tell them; if you know someone who has one, tell them. Public recommendations go into the Recommended by and Listed in sections below. The whole story is in [SUPPORT.md](SUPPORT.md).
+There is no donation button: the project is free and community-driven, and the help it needs is reach. If you know someone who would benefit from Skillsmith, tell them; if you have an audience, tell them; if you know someone who has one, tell them. Public recommendations go into the Recommended by and Listed in sections below. The whole story is in [SUPPORT.md](SUPPORT.md).
 
 ## License
 
@@ -156,7 +157,7 @@ If you want to learn more about the methodology behind this skill, please read t
 
 ## Listed in
 
-task-observer is indexed in these community lists and skill directories:
+The upstream task-observer is indexed in these community lists and skill directories:
 
 - [VoltAgent / awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills)
 - [Get Claude Skills](https://www.getclaudeskills.com/skills/task-observer-rebelytics)
@@ -229,4 +230,4 @@ If I forgot to list your recommendation here, please let me know or submit it vi
 
 ---
 
-**Created and maintained by [Eoghan Henn](https://rebelytics.com), improved by its community of users**
+**Created by [Eoghan Henn](https://rebelytics.com) as task-observer, improved by its community of users. This fork is maintained by [Cihan Cengiz](https://github.com/bcihanc).**

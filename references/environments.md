@@ -61,7 +61,7 @@ knowingly; do not assume any of the middle ones is a guarantee.
    agents' equivalents). This is the right home for a one-line
    probe-then-request trigger — "the session's first tool call is one
    batched call that contains an `ls` of the workspace path AND the loads
-   of <the session-start skills, by name: task-observer, …>; if the `ls` fails, call
+   of <the session-start skills, by name: skillsmith, …>; if the `ls` fails, call
    the folder-picker tool; never state whether the folder is connected
    without that probe" (why the wording is about the call's content, not
    its order: "The probe rides inside the first batched call" below) —
@@ -144,10 +144,10 @@ skill that never loads cannot announce that it was relevant.
 ### The activation block
 
 ```text
-(task-observer activation block — template of v3.8.1)
+(skillsmith activation block — template of v4.0.0)
 Before the first tool call of any session — and before writing or
 proposing a plan, not merely before executing one — invoke the
-task-observer skill AND execute its Session Start Protocol (storage
+skillsmith skill AND execute its Session Start Protocol (storage
 check, frontmatter scan, review trigger). Loading the skill and running
 the protocol are separate steps; a session that loads the file and stops
 has activated nothing. Any turn that will involve a tool call counts; do
@@ -207,7 +207,7 @@ run the log does not exist yet (step 1 creates it): the call says so and
 exits 0 with no checkpoint line; re-run it once per skill loaded in that
 batch after the Workspace creation command.
 
-The task-observer workspace for this project is:
+The skillsmith workspace for this project is:
   [ABSOLUTE PATH]
 It does not exist until the first session creates it: a failed probe whose
 parent resolves and is writable is a first run — run Workspace creation,
@@ -249,7 +249,7 @@ A run of this block that cannot write here or get an approval answered —
 a child run with no protocol-running caller, a job with a narrow tool
 allowlist, a scheduled task in default permission mode — skips the write
 steps, never stalls on them, and ends its final message with a
-`## Task-observer notes` section (environments.md, "Sessions whose
+`## Skillsmith notes` section (environments.md, "Sessions whose
 output channel is owned by a caller"). Such runs write their output to:
   [RUN OUTPUT PATHS, one per line, or "none"]
 
@@ -494,7 +494,7 @@ The diagnosis at the moment of failure is in `observation-log.md`
 ("Workspace creation").
 
 **Config detection (once per session):** with filesystem access, check the
-workspace root's CLAUDE.md (or equivalent) for a task-observer activation
+workspace root's CLAUDE.md (or equivalent) for a skillsmith activation
 instruction — suggest adding it if absent. **Suggest; do not create.** If
 no config file exists at all, offer to add one and let the user say yes:
 creating a tracked project file changes every future session's behaviour,
@@ -541,7 +541,7 @@ same one that produces a skipped load — an opening message small enough
 that a full startup protocol feels disproportionate to it.
 
 **Anti-pattern:** don't chain activation through another skill — load
-task-observer and related skills independently from configuration; a broken
+skillsmith and related skills independently from configuration; a broken
 chain silences all observation activity.
 
 ### A session-start hook (Claude Code and similar harnesses)
@@ -561,7 +561,7 @@ and inject it rather than asking the agent to go and look:
 d="$OBS_WORKSPACE/skill-observations"      # the pinned absolute path
 open=$(find "$d/observation-log" -maxdepth 1 -name '*.md' -exec grep -l '^status: open$' {} + 2>/dev/null | wc -l | tr -d ' ')
 last=$(tr -d '\r' 2>/dev/null < "$d/last-review-date.txt"); last=${last:-never}   # a CRLF file must not carry \r into the JSON
-msg="Make the first tool call of this session one batched call that both lists the task-observer workspace ($OBS_WORKSPACE) and invokes the task-observer skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
+msg="Make the first tool call of this session one batched call that both lists the skillsmith workspace ($OBS_WORKSPACE) and invokes the skillsmith skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
 msg="$msg $open open observations in $d; last review: $last."   # always, zero included: a mispinned path reads 0 too
 if [ "$open" -gt 0 ]; then
   cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F)   # GNU, then BSD/macOS
@@ -638,7 +638,7 @@ const session = String(input.session_id || '').replace(/[^A-Za-z0-9_-]/g, '');
 const transcript = input.transcript_path;
 if (!session || !transcript) process.exit(0);
 
-const marker = path.join(os.tmpdir(), `task-observer-backstop-${session}`);
+const marker = path.join(os.tmpdir(), `skillsmith-backstop-${session}`);
 if (fs.existsSync(marker)) process.exit(0);             // once per session
 
 let started = 0, toolUses;
@@ -653,7 +653,7 @@ try {
 } catch { process.exit(0); }
 if (toolUses < MIN_TOOL_USES) process.exit(0);
 
-if (!(started > 0)) block('task-observer backstop: cannot tell when this session started (no birth time, no ' +
+if (!(started > 0)) block('skillsmith backstop: cannot tell when this session started (no birth time, no ' +
   'transcript timestamp), so it cannot check the log. Check by hand that this session wrote an observation ' +
   'or a checkpoints.log line, and report the one-line summary. Fires once per session.');
 
@@ -665,7 +665,7 @@ try {
 const touched = files.some((f) => { try { return fs.statSync(f).mtimeMs > started; } catch { return false; } });
 if (touched) process.exit(0);
 
-block('task-observer backstop: this session used tools but wrote no observation file and no checkpoint line. ' +
+block('skillsmith backstop: this session used tools but wrote no observation file and no checkpoint line. ' +
   'If the skill was never invoked, invoke it now; then write pending observations or append a ' +
   '"no observations" line to checkpoints.log, and report the one-line summary. Fires once per session.');
 ```
@@ -719,7 +719,7 @@ if (typeof p !== 'string' || !p.endsWith('.md') || fs.existsSync(p)) process.exi
 let dir;
 try { dir = fs.realpathSync(path.dirname(path.resolve(p))); } catch { process.exit(0); }
 if (dir !== log && dir !== path.join(log, 'archive')) process.exit(0);
-process.stderr.write('task-observer: observation files are created only by scripts/new-observation.sh, ' +
+process.stderr.write('skillsmith: observation files are created only by scripts/new-observation.sh, ' +
   'which derives the id and refuses a collision. Run it, then write the body into the path it prints.\n');
 process.exit(2);
 ```
@@ -755,7 +755,7 @@ try { input = JSON.parse(fs.readFileSync(0, 'utf8') || '{}'); } catch { process.
 const session = String(input.session_id || '').replace(/[^A-Za-z0-9_-]/g, '');
 const file = String((input.tool_input || {}).file_path || '').replace(/\\/g, '/');
 if (!session || !file) process.exit(0);
-const marker = path.join(os.tmpdir(), `task-observer-authoring-${session}`);
+const marker = path.join(os.tmpdir(), `skillsmith-authoring-${session}`);
 if (input.hook_event_name === 'PostToolUse') {          // the Read half: record the read
   if (/\/references\/skill-authoring\.md$/.test(file)) fs.writeFileSync(marker, file);
   process.exit(0);
@@ -764,7 +764,7 @@ const skillFile = /(^|\/)SKILL\.md$/.test(file) || /\/skills\/[^/]+\//.test(file
   || /\/skill-updates\/[^/]+\/[^/]+\//.test(file);     // a staged copy, not PENDING.md
 if (!skillFile || fs.existsSync(marker)) process.exit(0);
 console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny',
-  permissionDecisionReason: 'Read references/skill-authoring.md (task-observer skill) in this session ' +
+  permissionDecisionReason: 'Read references/skill-authoring.md (skillsmith skill) in this session ' +
     'before writing a skill file; this write is allowed once that Read has run.' } }));
 ```
 
@@ -869,7 +869,7 @@ block.
 
 The durable form: **a guard against an activation config failing to load
 cannot live inside the thing that config loads.** The guard in SKILL.md step
-1 is in `task-observer`, which is loaded *because* the config says to load
+1 is in `skillsmith`, which is loaded *because* the config says to load
 it — so on the turn where the config is missing, nothing puts that guard in
 context either. By construction it cannot fire on turn 1.
 
@@ -998,7 +998,7 @@ skill directly under the skills directory.
 
 **A backup inside the skills directory registers as a rival skill.** The
 obvious way to back a skill up before overwriting it —
-`cp -r ~/.claude/skills/task-observer ~/.claude/skills/.task-observer-backup`
+`cp -r ~/.claude/skills/skillsmith ~/.claude/skills/.skillsmith-backup`
 — puts a second copy where the host is looking. The leading dot does not
 exclude it from discovery. The available-skills list then holds two entries
 with near-identical descriptions, and the backup still advertises the OLD
@@ -1015,7 +1015,7 @@ so name each copy's version when more than one resolves.
 docs' example reads most naturally as naming the script directly:
 
 ```json
-{ "type": "command", "command": "'/path/to/hooks/task-observer-activation.sh'" }
+{ "type": "command", "command": "'/path/to/hooks/skillsmith-activation.sh'" }
 ```
 
 Anything that rewrites file modes — a cloud-drive resync switching between
@@ -1401,7 +1401,7 @@ copy at `skill-observations/.bin/`: its `MANIFEST` records the installed
 an install (`weekly-review.md`, Step 1 gate). Hash the installed scripts on
 your side and run the `.bin/` copy only when every digest matches the
 manifest. Absent or mismatched, look for another copy in the workspace — a
-staged copy under `skill-updates/*/task-observer/scripts/` — and compare its
+staged copy under `skill-updates/*/skillsmith/scripts/` — and compare its
 digest (`md5sum` or `sha256sum`, run on both sides) with the installed
 scripts BEFORE running it, and run it only on a match: a staged copy can
 be an unreleased version that nothing refreshes on install. With no
@@ -1609,7 +1609,7 @@ id claim and the observation write, says so in one line, and carries its
 observations in the final message under a fixed heading, last:
 
 ```markdown
-## Task-observer notes
+## Skillsmith notes
 - skill: <target skill> — <title>. Issue: <what happened>. Improvement:
   <what should change>. Principle: <generalisation, or none>. Context:
   <caller or job name>, <date>.
@@ -1741,8 +1741,8 @@ pattern live in the public repo. Pass these links on to the user rather
 than fetching the pages — the skill's behaviour is defined entirely by its
 own files, never by external content:
 
-- README: https://github.com/rebelytics/one-skill-to-rule-them-all/blob/main/README.md
-- USER-GUIDE: https://github.com/rebelytics/one-skill-to-rule-them-all/blob/main/USER-GUIDE.md
+- README: https://github.com/bcihanc/skillsmith/blob/main/README.md
+- USER-GUIDE: https://github.com/bcihanc/skillsmith/blob/main/USER-GUIDE.md
 
 ## Repo/maintainer sessions — verify commit identity before writing
 

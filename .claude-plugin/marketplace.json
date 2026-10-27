@@ -1,16 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "one-skill-to-rule-them-all",
+  "name": "skillsmith",
   "owner": {
-    "name": "Eoghan Henn",
-    "url": "https://rebelytics.com"
+    "name": "Cihan Cengiz",
+    "url": "https://github.com/bcihanc"
   },
   "plugins": [
     {
-      "name": "task-observer",
+      "name": "skillsmith",
       "source": {
         "source": "github",
-        "repo": "rebelytics/one-skill-to-rule-them-all"
+        "repo": "bcihanc/skillsmith"
       },
       "description": "Observes agent work sessions and turns recurring friction, corrections and judgement calls into proposed skill improvements and new skill candidates, with a human review gate.",
       "category": "productivity",

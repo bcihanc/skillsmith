@@ -434,14 +434,14 @@ complete. The failure shape: a capture fallback the processing step never
 drains is a second log nobody reviews.
 
 **Harvest the run-output notes next.** Runs that cannot write or get an
-approval answered end their final message with a `## Task-observer
+approval answered end their final message with a `## Skillsmith
 notes` section (`references/environments.md`, "Sessions whose output
 channel is owned by a caller") at the run-output paths the activation
 block's `[RUN OUTPUT PATHS]` line or a task definition names. For each
 path, read every file not yet marked, take the section's bullets through
 the same write path as an inbox entry — one at a time, file on disk
 before the source is marked — and mark the source: where the file is
-writable, the heading becomes `## Task-observer notes (harvested
+writable, the heading becomes `## Skillsmith notes (harvested
 <date>)`; where it is not, append its path and sha256 to
 `skill-observations/harvested.txt`, which the drain reads first. A
 section reading `none` is marked without a write. Report under Log
@@ -888,7 +888,7 @@ stage the export of that commit and name the commit in the manifest, so
 the staged copy, the install and the master start equal; where the install
 is ahead of the repository, bring the repository level first (Step 5,
 "Seed from the CURRENT state"). This skill is the standing example: wherever the
-user is not its maintainer, `task-observer` is (b). Choosing the
+user is not its maintainer, `skillsmith` is (b). Choosing the
 companion route may mean creating the `{skill}-extras` skill in this
 review, which the Constraints allow as the one exception to "no new
 skills in a review". Grow the (c) list when an update fails for
@@ -1217,9 +1217,9 @@ guards are all mandatory:
    for the user to read and submit, never sent by the skill.
 
 The body's LAST line is the provenance, and it is evidence for the
-maintainer, not a badge: "Logged by task-observer during live use, N
+maintainer, not a badge: "Logged by skillsmith during live use, N
 sessions, observed instance above" followed by
-github.com/rebelytics/one-skill-to-rule-them-all. The guards are the
+github.com/bcihanc/skillsmith. The guards are the
 feature: maintainers already receive more generated reports than they can
 read, and a tool name carried on thin reports becomes the name of the noise.
 

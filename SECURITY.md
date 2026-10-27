@@ -1,6 +1,6 @@
 # Security policy
 
-task-observer is a skill: instruction text plus a few shell snippets and
+skillsmith is a skill: instruction text plus a few shell snippets and
 Python scripts that an agent runs inside your workspace. It has no server,
 no network service and no credentials of its own. The security questions
 that matter are therefore about what the skill tells an agent to do on
@@ -31,7 +31,7 @@ patched; update to the latest release.
 ## How to report
 
 Please do **not** open a public issue for a vulnerability. Email
-**eoghan@rebelytics.com** with:
+**b.cihancengiz@gmail.com** with:
 
 - what the problem is and which file or snippet it is in;
 - how to reproduce it (the environment, the harness and its permission

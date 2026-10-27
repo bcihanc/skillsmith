@@ -1,4 +1,4 @@
-# Getting Started with the task-observer meta-skill (aka "One skill to rule them all")
+# Getting Started with the skillsmith meta-skill
 
 This guide includes practical tips for getting value out of the meta-skill. It's based on my own daily usage of the skill across Claude Cowork, the web interface, Claude Code (only via the desktop app) and the mobile app. I've been using this skill for nine months now and it has logged over 1,900 observations across my 84 skills, most of which were applied as skill improvements. The majority of my 84 skills were themselves created based on observations by the meta-skill.
 
@@ -39,13 +39,13 @@ Existing files in your shared folder are not modified by the observer. If you po
 
 ## Checking whether the skill has loaded
 
-Once you've started a Cowork task by giving your first instructions or some context about the work, you can check in the right sidebar which skills have been invoked. If you think the current task has skill creation or improvement potential but you don't see the task observer, ask Claude directly why the skill hasn't loaded. It should then guide you towards a better setup.
+Once you've started a Cowork task by giving your first instructions or some context about the work, you can check in the right sidebar which skills have been invoked. If you think the current task has skill creation or improvement potential but you don't see Skillsmith, ask Claude directly why the skill hasn't loaded. It should then guide you towards a better setup.
 
 ## Dual-layer activation
 
-The task observer needs to be active at the start of a session to automatically log observations in the background, but you can always invoke it later and ask Claude to analyse the entire conversation for skill creation or improvement potentials. The skill can activate on its own by matching your task description against its triggers, but this isn't always reliable: Claude is mainly focused on your task, not on loading background skills.
+Skillsmith needs to be active at the start of a session to automatically log observations in the background, but you can always invoke it later and ask Claude to analyse the entire conversation for skill creation or improvement potentials. The skill can activate on its own by matching your task description against its triggers, but this isn't always reliable: Claude is mainly focused on your task, not on loading background skills.
 
-The more reliable approach is a dual-layer setup: the skill's own triggers plus a direct instruction in your CLAUDE.md file telling Claude to load the task observer at the start of every task-oriented session. Make sure that instruction says to run the skill's Session Start Protocol, not just to load the skill — loading and executing are separate steps, and a session that loads the file and then stops has activated nothing. The meta-skill itself will guide you towards setting this up, and the same approach works for any other skill you want to load consistently (so keep this in mind for the future).
+The more reliable approach is a dual-layer setup: the skill's own triggers plus a direct instruction in your CLAUDE.md file telling Claude to load Skillsmith at the start of every task-oriented session. Make sure that instruction says to run the skill's Session Start Protocol, not just to load the skill — loading and executing are separate steps, and a session that loads the file and then stops has activated nothing. The meta-skill itself will guide you towards setting this up, and the same approach works for any other skill you want to load consistently (so keep this in mind for the future).
 
 ## How the skill works during a session
 
@@ -73,11 +73,11 @@ Versions before 3.0.0 kept all observations in one file, `skill-observations/log
 
 As observations accumulate, some of them reveal principles that aren't specific to one skill but apply across your whole library. For example, "every skill with rules should have a mechanism to enforce them" isn't about any single skill: it's about all of them.
 
-The task observer captures these as cross-cutting principles in a separate file. When skills are later created or updated, Claude checks them against these principles automatically. This is another source of compounding value: the more you use the system, the higher the quality floor across all your skills.
+Skillsmith captures these as cross-cutting principles in a separate file. When skills are later created or updated, Claude checks them against these principles automatically. This is another source of compounding value: the more you use the system, the higher the quality floor across all your skills.
 
 ## Open-source vs internal skills
 
-The task observer distinguishes between two types of skills:
+Skillsmith distinguishes between two types of skills:
 
 **Open-source skills** are methodology-driven and project-agnostic. They capture workflows and processes that would be useful to anyone in your field. The default bias is towards open-source: if a skill could go either way, the meta-skill will try to strip out the specifics and generalise.
 
@@ -99,7 +99,7 @@ Now, since Claude Cowork introduced scheduled tasks, I have an automatic skill r
 
 ## The skill-creator
 
-Claude has a built-in skill called `skill-creator` that handles the actual building and restructuring of skills. The task observer and the skill creator work hand in hand: the observer identifies what to build or improve, and the creator handles how.
+Claude has a built-in skill called `skill-creator` that handles the actual building and restructuring of skills. Skillsmith and the skill creator work hand in hand: the observer identifies what to build or improve, and the creator handles how.
 
 ## Making the skill your own
 
@@ -109,7 +109,7 @@ The easiest way to improve the skill is by talking about it directly with Claude
 
 ## Getting kickstarted
 
-One thing that will help you get going faster is to create some basic skills proactively, instead of waiting for the task observer to suggest new skills to you.
+One thing that will help you get going faster is to create some basic skills proactively, instead of waiting for Skillsmith to suggest new skills to you.
 
 A great candidate for everyone is a personal writing style skill. Ask Claude to analyse some of your writing samples (ideally your best pre-AI work) and create a writing style skill from that. From then on, every time you fix a draft from Claude, paste your edited version back in. The meta-skill will take care of logging observations to improve your writing style skill over time.
 

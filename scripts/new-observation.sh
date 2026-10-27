@@ -8,7 +8,7 @@
 #   <slug>            kebab-case, no id prefix, no extension ("short-slug")
 #   [workspace-root]  the pinned absolute workspace path — the directory that
 #                     holds skill-observations/. Defaults to the environment
-#                     variable TASK_OBSERVER_WORKSPACE. One of the two is
+#                     variable SKILLSMITH_WORKSPACE. One of the two is
 #                     required; the log is never resolved from the cwd.
 #   --body <file>     optional, before or after the slug: once the file is
 #                     created, <file> (frontmatter and body, written by the
@@ -76,7 +76,7 @@ while [ $# -gt 0 ]; do
       shift ;;
   esac
 done
-[ -n "$root" ] || root="${TASK_OBSERVER_WORKSPACE:-}"
+[ -n "$root" ] || root="${SKILLSMITH_WORKSPACE:-}"
 
 if [ -z "$slug" ]; then
   echo "usage: new-observation.sh [--body <file>] <slug> [workspace-root]" >&2; exit 1
@@ -92,7 +92,7 @@ case $slug in
   ([0-9][0-9][0-9][0-9]-*) echo "slug must not start with an id prefix: got '$slug'" >&2; exit 1 ;;
 esac
 if [ -z "$root" ]; then
-  echo "no workspace root: pass it as the second argument or set TASK_OBSERVER_WORKSPACE" >&2; exit 1
+  echo "no workspace root: pass it as the second argument or set SKILLSMITH_WORKSPACE" >&2; exit 1
 fi
 # A Windows drive path (C:/... or C:\...) is absolute there and relative on
 # POSIX, so it is accepted only where cygpath can convert it (Git Bash, MSYS,

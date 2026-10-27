@@ -419,7 +419,7 @@ gets a short "How this skill improves" section, written for the skill's
 next maintainer: the input is repeated corrections and gaps filled by hand;
 the manual method is two lines — note each correction where the skill's
 rule was missing or wrong, and fold the notes into the skill at a regular
-review; task-observer automates that capture and review; and
+review; skillsmith automates that capture and review; and
 benchmarked-optimisation tools, which score a skill against a test set,
 complement it. Its attribution block carries the canonical-source line,
 `metadata.source` as in the template above, which is what lets a

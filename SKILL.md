@@ -1,15 +1,15 @@
 ---
-name: "task-observer"
+name: "skillsmith"
 core_max_lines: 682
-version: "3.8.1"
-description: "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work as new skills. Use during ANY multi-step task, agentic workflow, or work session. Also triggers in post-task feedback discussions and when the user mentions skill observations, the observation log, or skill taxonomy. Also known as \"One Skill to Rule Them All\" — trigger on this phrase too. IMPORTANT: invoke this skill before the FIRST tool call of any session and before writing or proposing a plan — any turn that will involve a tool call counts. This sentence is the session-start trigger and the only activation layer that survives an unreachable config file; pair it with a CLAUDE.md instruction or a session-start hook (references/environments.md). A subagent dispatched by a session already running it does not run it: it writes nothing and puts its findings in its report."
+version: "4.0.0"
+description: "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work as new skills. Use during ANY multi-step task, agentic workflow, or work session. Also triggers in post-task feedback discussions and when the user mentions skill observations, the observation log, or skill taxonomy. Formerly task-observer (\"One Skill to Rule Them All\") — trigger on these names too. IMPORTANT: invoke this skill before the FIRST tool call of any session and before writing or proposing a plan — any turn that will involve a tool call counts. This sentence is the session-start trigger and the only activation layer that survives an unreachable config file; pair it with a CLAUDE.md instruction or a session-start hook (references/environments.md). A subagent dispatched by a session already running it does not run it: it writes nothing and puts its findings in its report."
 license: CC-BY-4.0
 metadata:
   author: Eoghan Henn and contributors
-  source: github.com/rebelytics/one-skill-to-rule-them-all
+  source: github.com/bcihanc/skillsmith
 ---
 
-# Task Observer — Continuous Skill Discovery & Improvement
+# Skillsmith — Continuous Skill Discovery & Improvement
 
 Skills improve best from friction noticed during real work, not from sitting
 down to "improve a skill." This skill formalises that noticing so insights
@@ -662,7 +662,7 @@ in its `skill:` list. Full protocol: `references/observation-log.md`.
 ## Feedback on this skill
 
 If the user has methodology feedback, offer to draft a report for
-github.com/rebelytics/one-skill-to-rule-them-all, running the feedback
+github.com/bcihanc/skillsmith, running the feedback
 pre-flight in `references/skill-authoring.md` first; if the problem is the
 agent not following the skill's rules, acknowledge and correct it instead.
 
@@ -679,4 +679,4 @@ agent not following the skill's rules, acknowledge and correct it instead.
 | Same rule broken twice? | The fix is a structural barrier (hook, lint, default) — never a third rewording |
 | Changing an observation (status/archival)? | Re-read that one file, edit only its frontmatter, or `mv` it to `observation-log/archive/` — no shared-file rewrite |
 
-Task Observer: Eoghan Henn and contributors | CC BY 4.0
+Skillsmith, a fork of task-observer by Eoghan Henn and contributors | CC BY 4.0

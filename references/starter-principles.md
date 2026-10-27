@@ -6,7 +6,7 @@ Starter set version: 4
 
 This file is NOT the adopter's principles file. It is an optional seed:
 a curated set of generic methodology principles, accumulated over a long
-run of the task-observer loop and stripped of their provenance
+run of the skillsmith loop and stripped of their provenance
 (observation ids, dates, the originating setup's skill and client names).
 The live file is `[workspace folder]/skill-observations/cross-cutting-principles.md`,
 and its authority comes from the adopter's own evidence trail — so nothing
@@ -289,7 +289,7 @@ that drifts, and traps methodology in a non-shareable location.
 output formats, or filtering criteria; all of that belongs in a skill the
 task invokes. Pattern: task prompt = "Load skill X, then follow its
 instructions." This lets the skill improve independently of the task, be
-invoked manually in ad-hoc sessions, and be observed by the task-observer
+invoked manually in ad-hoc sessions, and be observed by the skillsmith
 on every run. When creating any scheduled task, first ask whether a skill
 exists for its domain — and if not, create the skill first.
 

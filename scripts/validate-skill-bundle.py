@@ -82,7 +82,7 @@ SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 # the skill under test — `core_max_lines:` in SKILL.md frontmatter, or a
 # `.core-ceiling` file beside it holding the number. A skill that declares
 # neither has not opted in: the count is reported and nothing is gated. This
-# script ships inside task-observer but is run against every skill in a
+# script ships inside skillsmith but is run against every skill in a
 # library, and a constant that describes one skill must never bound another.
 #
 # The ceiling also FOLLOWS the core down. A check that only blocks growth
@@ -1259,7 +1259,7 @@ def scan_case(scenario, pass_root):
         if scenario == "split":
             (root / "skill-observations" / "log.md").write_text(
                 "### Observation 1: A\n\n### Observation 2: B\n", encoding="utf-8")
-        env = {k: v for k, v in os.environ.items() if k != "TASK_OBSERVER_WORKSPACE"}
+        env = {k: v for k, v in os.environ.items() if k != "SKILLSMITH_WORKSPACE"}
         args = ["bash", str(SCAN_SCRIPT)] + ([str(root)] if pass_root else [])
         r = subprocess.run(args, cwd=tmp, env=env, capture_output=True, text=True,
                            encoding="utf-8", errors="replace")
