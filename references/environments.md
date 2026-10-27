@@ -183,13 +183,12 @@ target_file: field carries by any path.)
 (Use find, not a bare *.md glob: under zsh an unmatched glob aborts the
 whole block, and on an empty log it is unmatched in every session.)
 Apply their insights to the current work — meaning: let them change what
-you do in THIS task. Editing the skill file, or writing the rule into any
-other file a later session reads, is acting on the observation and waits
-for the review. See "Log, don't act" in SKILL.md: the test is whether the
-action leaves a durable change outside the observation log. Run this at every skill load, however many skills load
-in one session. The session-start scan does not cover it: that is a
-frontmatter sweep over every observation at session start, this is a
-body-level lookup for one skill at the moment its rules are applied.
+you do in THIS task. Editing the skill file, or writing the rule into
+any other file a later session reads, is acting on the observation and
+waits for the review. See "Default to log-and-defer" in SKILL.md: the
+test is whether the action leaves a durable change outside the
+observation log. Run this at every skill load, however many skills load
+in one session. The session-start scan does not cover it.
 
 The converse holds too: the grep, and any checkpoint line recording the
 load, run only in the same batch as the Skill invocation, and take the
@@ -202,10 +201,7 @@ substitute for the skill that owns it.
 Where scripts run, the lookup and its checkpoint line are one command:
   bash "<skill directory>/scripts/skill-load.sh" "[ABSOLUTE PATH]" <skill-name>
 The Skill invocation and that call are ONE batch — emit them together,
-one call per skill loaded, never the call in a later batch. On a first
-run the log does not exist yet (step 1 creates it): the call says so and
-exits 0 with no checkpoint line; re-run it once per skill loaded in that
-batch after the Workspace creation command.
+one call per skill loaded, never the call in a later batch.
 
 The skillsmith workspace for this project is:
   [ABSOLUTE PATH]
