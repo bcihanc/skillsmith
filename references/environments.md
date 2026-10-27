@@ -49,27 +49,29 @@ knowingly; do not assume any of the middle ones is a guarantee.
 1. **Description matching** (weakest). The skill's frontmatter description
    competes with every other skill's for relevance to the opening message.
    It loses most often on short, tool-using requests that read like
-   questions ("list the files in this repo"), on sessions that open small
-   and grow, and whenever a domain skill matches the opening message
-   strongly. On platforms with no hook mechanism this is the only tier
-   that survives an unmounted or unreachable config file, which is why the
-   description itself carries a session-start trigger.
+   questions yet take several tool calls ("why does this test fail?"),
+   on sessions that open small and grow, and whenever a domain skill
+   matches the opening message strongly. On platforms with no hook
+   mechanism this is the only tier that survives an unmounted or
+   unreachable config file, which is why the description itself carries
+   a task-start trigger.
 2. **User-level preferences** (folder-independent, still probabilistic).
    Agent settings the user controls that are injected into every session's
    system prompt regardless of which folder, if any, is connected (in
    Cowork, the personal-preferences field in the app settings; other
    agents' equivalents). This is the right home for a one-line
-   probe-then-request trigger — "the session's first tool call is one
-   batched call that contains an `ls` of the workspace path AND the loads
-   of <the session-start skills, by name: skillsmith, …>; if the `ls` fails, call
-   the folder-picker tool; never state whether the folder is connected
-   without that probe" (why the wording is about the call's content, not
-   its order: "The probe rides inside the first batched call" below) —
-   because a config
-   file inside the workspace folder cannot fire in the very case it
-   targets: when no folder is connected, there is no config file. Verify
-   the channel once by asking a folder-less session to quote its
-   preferences block; a line that does not reach the agent is not a tier.
+   probe-then-request trigger — "the first tool call of a multi-step
+   task (three or more tool calls, a file write, or a plan) is one
+   batched call that contains an `ls` of the workspace path AND the
+   loads of <the session-start skills, by name: skillsmith, …>; if the
+   `ls` fails, call the folder-picker tool; never state whether the
+   folder is connected without that probe" (why the wording is about the
+   call's content, not its order: "The probe rides inside the first
+   batched call" below) — because a config file inside the workspace
+   folder cannot fire in the very case it targets: when no folder is
+   connected, there is no config file. Verify the channel once by asking
+   a folder-less session to quote its preferences block; a line that
+   does not reach the agent is not a tier.
 3. **Configuration instruction** (better, still probabilistic). A CLAUDE.md
    or project-instruction block, shown below. Empirically skippable under
    the same conditions as tier 1, and silently absent when the file it
@@ -109,13 +111,14 @@ sent half of it, and the half left behind is the half that made it work.
 **Word the trigger mechanically, not judgementally.** "Task-oriented
 session" asks the agent to classify the session at its first turn, before
 it knows how the session will develop, and short factual-looking requests
-get classified out. The block below keys on tool use instead: any turn
-that will involve a tool call counts. And activation must precede
-*planning*, not merely execution — where a workflow proposes a plan for
-approval first, a plan written without the relevant skills carries
-uninformed decisions past the review gate, and approval locks them in.
-Load skills before exploring, researching or drafting the plan: both,
-skill first.
+get classified out. The block below keys on countable proxies instead:
+three or more tool calls, a file write, or a plan; when unsure it
+counts, and a session that grows into one, or a user correction,
+triggers it then. And activation must precede *planning*, not merely
+execution — where a workflow proposes a plan for approval first, a plan
+written without the relevant skills carries uninformed decisions past
+the review gate, and approval locks them in. Load skills before
+exploring, researching or drafting the plan: both, skill first.
 
 **The block has a per-session cost, paid knowingly.** Every session it
 covers loads SKILL.md in full (bounded by `core_max_lines` in its
@@ -145,31 +148,34 @@ skill that never loads cannot announce that it was relevant.
 
 ```text
 (skillsmith activation block — template of v4.0.0)
-Before the first tool call of any session — and before writing or
-proposing a plan, not merely before executing one — invoke the
-skillsmith skill AND execute its Session Start Protocol (storage
-check, frontmatter scan, review trigger). Loading the skill and running
-the protocol are separate steps; a session that loads the file and stops
-has activated nothing. Any turn that will involve a tool call counts; do
-not classify the session as "too simple" from its opening message.
-A step you did not run is reported before the answer, in one line — never
-after it, where it reads as a suggestion. If the skill does not resolve on
-this turn, say which probe told you so (the skill listing, or the skill
-directory on disk), re-check the listing on every later turn that makes a
-tool call, and run the protocol the first time it resolves — a "not
-installed" verdict holds for one turn.
+Before the first tool call of any multi-step task — three or more tool
+calls, a file write, or a plan, and before proposing that plan, not
+merely before executing it — invoke the skillsmith skill AND execute
+its Session Start Protocol (storage check, frontmatter scan, review
+trigger). Loading the skill and running the protocol are separate steps;
+a session that loads the file and stops has activated nothing. A plain
+question or a one- or two-call lookup does not count; when unsure, it
+counts, and a session that grows into such a task invokes the skill on
+the turn it does, as does a user correction of how you work.
+Once the skill is invoked, a protocol step you did not run is reported
+before the answer, in one line — never after it, where it reads as a
+suggestion. If the skill does not resolve on this turn, say which probe
+told you so (the skill listing, or the skill directory on disk),
+re-check the listing on every later turn of a multi-step task, and run
+the protocol the first time it resolves — a "not installed" verdict
+holds for one turn.
 
 Select skills on the DECISION the request is about, not on the artefact it
 arrived as. Name what the user is deciding, then match the installed skill
 descriptions against that — a request handed over as a file to review
 still needs the skill whose description names its subject.
 
-After completing each task, list the observation records written this
-session in the same turn and report a one-line summary from that listing
-(ids and titles, or "none logged and why") — never from memory of
-writing them. This is the activation backstop: it forces a look at the log,
-so a session that silently skipped the protocol is discovered at the
-first task boundary instead of never.
+After completing each multi-step task, list the observation records
+written this session in the same turn and report a one-line summary from
+that listing (ids and titles, or "none logged and why") — never from
+memory of writing them. This is the activation backstop: it forces a
+look at the log, so a session that silently skipped the protocol is
+discovered at the first task boundary instead of never.
 
 Loading a skill is not complete until you have queried the observation
 log for OPEN observations naming it and read their bodies:
@@ -533,8 +539,9 @@ Treat *loaded but not run* as a distinct failure cause, alongside the
 skill being absent, truncated, or present and skipped: it is the likeliest
 of the four, precisely because the load's visible success stands in for
 the protocol's invisible omission, and the aggravating condition is the
-same one that produces a skipped load — an opening message small enough
-that a full startup protocol feels disproportionate to it.
+same one that produces a skipped load — a multi-step task whose opening
+message is small enough that a full startup protocol feels
+disproportionate to it.
 
 **Anti-pattern:** don't chain activation through another skill — load
 skillsmith and related skills independently from configuration; a broken
@@ -557,7 +564,7 @@ and inject it rather than asking the agent to go and look:
 d="$OBS_WORKSPACE/skill-observations"      # the pinned absolute path
 open=$(find "$d/observation-log" -maxdepth 1 -name '*.md' -exec grep -l '^status: open$' {} + 2>/dev/null | wc -l | tr -d ' ')
 last=$(tr -d '\r' 2>/dev/null < "$d/last-review-date.txt"); last=${last:-never}   # a CRLF file must not carry \r into the JSON
-msg="Make the first tool call of this session one batched call that both lists the skillsmith workspace ($OBS_WORKSPACE) and invokes the skillsmith skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
+msg="Before the first tool call of a multi-step task (three or more tool calls, a file write, or a plan), make that call one batched call that both lists the skillsmith workspace ($OBS_WORKSPACE) and invokes the skillsmith skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
 msg="$msg $open open observations in $d; last review: $last."   # always, zero included: a mispinned path reads 0 too
 if [ "$open" -gt 0 ]; then
   cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F)   # GNU, then BSD/macOS
@@ -613,8 +620,9 @@ nag that never fires and one correctly silent look identical otherwise.
 
 The per-task backstop fails with the block it lives in (above): a session
 that skipped the protocol skipped the backstop at every task boundary too.
-Where the harness has a stop event, run the check there instead: *has this session
-used tools, and has anything under `observation-log/` or `checkpoints.log`
+Where the harness has a stop event, run the check there instead: *has
+this session done a multi-step task (three or more tool uses, or a file
+write), and has anything under `observation-log/` or `checkpoints.log`
 been written since it started?* If not, block the stop once per session
 with a one-line instruction; stay silent for conversation, for a session
 that already wrote, for a second block in a row, and when the log cannot
@@ -623,7 +631,7 @@ be read. Node, no dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
 ```js
 // Stop hook: the per-task backstop as a harness event instead of prose.
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const MIN_TOOL_USES = 3; // below this the turn is conversation, not work
+const MIN_TOOL_USES = 3; // the block's multi-step task: this many tool uses, or one file write
 const base = path.join('[ABSOLUTE PATH]', 'skill-observations'); // the pinned workspace
 const block = (reason) => { fs.writeFileSync(marker, new Date().toISOString()); console.log(JSON.stringify({ decision: 'block', reason })); process.exit(0); };
 
@@ -637,17 +645,18 @@ if (!session || !transcript) process.exit(0);
 const marker = path.join(os.tmpdir(), `skillsmith-backstop-${session}`);
 if (fs.existsSync(marker)) process.exit(0);             // once per session
 
-let started = 0, toolUses;
+let started = 0, toolUses, writes;
 try {
   const st = fs.statSync(transcript), text = fs.readFileSync(transcript, 'utf8');
   toolUses = (text.match(/"type":\s*"tool_use"/g) || []).length;
+  writes = (text.match(/"name":\s*"(Write|Edit|MultiEdit|NotebookEdit)"/g) || []).length;
   // Birth time is 0 where the filesystem has none and equals ctime where the
   // platform substitutes it; either would make every file read as untouched
   // or touched. Fall back to the transcript's first timestamp.
   if (st.birthtimeMs > 0 && st.birthtimeMs < st.ctimeMs) started = st.birthtimeMs;
   else { const m = text.match(/"timestamp":\s*"([^"]+)"/); if (m) started = Date.parse(m[1]) || 0; }
 } catch { process.exit(0); }
-if (toolUses < MIN_TOOL_USES) process.exit(0);
+if (toolUses < MIN_TOOL_USES && !writes) process.exit(0);   // counted per session, so short lookups can add up
 
 if (!(started > 0)) block('skillsmith backstop: cannot tell when this session started (no birth time, no ' +
   'transcript timestamp), so it cannot check the log. Check by hand that this session wrote an observation ' +
@@ -782,34 +791,35 @@ listed, protocol ran, hook emits valid JSON) while the one thing that
 matters is untested, and the tempting close is "installed and tested".
 Report the install as **activation unverified** until a fresh session has
 been seen invoking the skill on its own, and name the check: the next
-session opens with ordinary work that names neither the skill, the log
-nor the check, and only afterwards is the skill confirmed invoked (not
-merely listed) with the Session Start Protocol run — by evidence of
-invocation, not by a side effect that a hand invocation would also
-produce. If the environment offers no way to start a fresh session from
-the installing one (a GUI-only harness, no CLI), hand the check to the
-user: start the next session with unrelated work, then look at the
-`session-start scan` line in `checkpoints.log` or at the transcript; an
-unverifiable step never closes silently as "tested". A pass from a
-session whose first request named the skill is a hand invocation and is
-discarded, not counted (`skill-authoring.md`, "Trial design").
+session opens with ordinary multi-step work that names neither the
+skill, the log nor the check, and only afterwards is the skill confirmed
+invoked (not merely listed) with the Session Start Protocol run — by
+evidence of invocation, not by a side effect that a hand invocation
+would also produce. If the environment offers no way to start a fresh
+session from the installing one (a GUI-only harness, no CLI), hand the
+check to the user: start the next session with unrelated multi-step
+work, then look at the `session-start scan` line in `checkpoints.log` or
+at the transcript; an unverifiable step never closes silently as
+"tested". A pass from a session whose first request named the skill is a
+hand invocation and is discarded, not counted (`skill-authoring.md`,
+"Trial design").
 
 The runtime cannot diagnose its own absence — Session Start step 4 only
 runs once activation has already succeeded — so the external diagnostic
 is the one that catches a skipped install step: **if
-`skill-observations/observation-log/` does not exist after a few sessions
-of tool-using work, activation never happened**; check the activation
-block in the config, or install the hook. The directory existing proves
-only that one session ran: a first session loaded by hand, or by a lucky
-description match, writes entries and the trace, and the install then
-goes quiet. So the diagnostic has a second half: **the last
-`session-start scan` line in `skill-observations/checkpoints.log` is the
-last session that ran the protocol** — days old while work went on means
-activation is not running, whatever the log holds. The scan prints a
-`GAP:` line when that date is 7 or more days old, which helps only the
-session that is activated after the gap; the dated line is the check
-anyone can run from outside. The README carries the same diagnostic for
-users who never read this file.
+`skill-observations/observation-log/` does not exist after a few
+sessions of multi-step work, activation never happened**; check the
+activation block in the config, or install the hook. The directory
+existing proves only that one session ran: a first session loaded by
+hand, or by a lucky description match, writes entries and the trace, and
+the install then goes quiet. So the diagnostic has a second half: **the
+last `session-start scan` line in `skill-observations/checkpoints.log`
+is the last session that ran the protocol** — days old while multi-step
+work went on means activation is not running, whatever the log holds.
+The scan prints a `GAP:` line when that date is 7 or more days old,
+which helps only the session that is activated after the gap; the dated
+line is the check anyone can run from outside. The README carries the
+same diagnostic for users who never read this file.
 
 **Another skill's session-start output is a false positive for
 activation.** A harness that injects a different always-on skill's
@@ -857,7 +867,7 @@ nothing revisits it, so when the listing catches up every tool call in
 between went unobserved and the earlier claim stands uncorrected. So a "not installed" verdict
 names the probe it came from — the listing lookup, or a disk check of the
 skill directory — because the two disagree exactly here, and it holds for
-one turn: re-check the listing on each later turn that makes a tool call,
+one turn: re-check the listing on each later turn of a multi-step task,
 and run the Session Start Protocol in full the first time the skill
 resolves. Like the guard below, this rule cannot live only in the skill
 that failed to resolve; the line that carries it is in the activation
@@ -905,18 +915,19 @@ preparation rather than action. Stating the precedence more firmly does
 not change that, because the load discharges the felt obligation.
 
 So the rule is about the **content of the first call, not its order**: the
-session's first tool call is a single batched call that contains the probe
-— a listing of the pinned workspace path through the tool that reaches
-that filesystem, a device call in a bridged session; if that tool's server
-is still connecting, a tool search for it in batch 1 and the listing as
-the first call of batch 2 — the target is the test, not the command's
-success — and any session-start skill loads ride in that same batch,
-never in an earlier one. That removes the contest instead of adjudicating it, the
-harness's parallel-call guidance already permits it, and it is checkable
-after the fact from the transcript (an ordering rule between two "first"
-actions is not). SKILL.md step 1 states it that way; the tier-2 preferences
-line above is worded to match; the activation block's "before the first
-tool call" is satisfied by the load riding *in* that call.
+first tool call of the multi-step task is a single batched call that
+contains the probe — a listing of the pinned workspace path through the
+tool that reaches that filesystem, a device call in a bridged session;
+if that tool's server is still connecting, a tool search for it in batch
+1 and the listing as the first call of batch 2 — the target is the test,
+not the command's success — and any session-start skill loads ride in
+that same batch, never in an earlier one. That removes the contest
+instead of adjudicating it, the harness's parallel-call guidance already
+permits it, and it is checkable after the fact from the transcript (an
+ordering rule between two "first" actions is not). SKILL.md step 1
+states it that way; the tier-2 preferences line above is worded to
+match; the activation block's "before the first tool call" is satisfied
+by the load riding *in* that call.
 
 **The pre-skill tier's line names the complete batch, not only the
 probe.** Whatever the harness reads before any skill — Cowork's
@@ -1690,12 +1701,13 @@ them: it holds the per-file line ceilings the validator reads.
 
 **A compaction is a session start.** So is a handoff-doc resume and a
 re-invoked scheduled run. Each is a new context with old work in it, which
-is exactly the condition the Session Start Protocol exists for, and on the
-first turn after any of them the protocol runs again in full — storage
-probe, frontmatter scan, review trigger, and the per-skill grep for every
-skill the task in front of you needs. Where the CLAUDE.md structural
-trigger reaches the resumed context it re-invokes the skill; do not rely on
-it having done so.
+is exactly the condition the Session Start Protocol exists for, and on
+the first turn after any of them — in a session that had invoked the
+skill, or whose resumed work is multi-step — the protocol runs again in
+full — storage probe, frontmatter scan, review trigger, and the
+per-skill grep for every skill the task in front of you needs. Where the
+CLAUDE.md structural trigger reaches the resumed context it re-invokes
+the skill; do not rely on it having done so.
 
 **The write path has to survive the compaction; the skill body does
 not.** The pointer to this section sits in the skill body, which

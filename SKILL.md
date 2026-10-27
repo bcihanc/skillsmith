@@ -2,7 +2,7 @@
 name: "skillsmith"
 core_max_lines: 682
 version: "4.0.0"
-description: "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work as new skills. Use during ANY multi-step task, agentic workflow, or work session. Also triggers in post-task feedback discussions and when the user mentions skill observations, the observation log, or skill taxonomy. Formerly task-observer (\"One Skill to Rule Them All\") — trigger on these names too. IMPORTANT: invoke this skill before the FIRST tool call of any session and before writing or proposing a plan — any turn that will involve a tool call counts. This sentence is the session-start trigger and the only activation layer that survives an unreachable config file; pair it with a CLAUDE.md instruction or a session-start hook (references/environments.md). A subagent dispatched by a session already running it does not run it: it writes nothing and puts its findings in its report."
+description: "Monitors task execution for skill improvement opportunities: logs patterns, user corrections and methodology worth preserving to the workspace, turns them into skill updates in a weekly review, and flags repeating work as new skills. Use during ANY multi-step task or agentic workflow. Also triggers in post-task feedback discussions and when the user mentions skill observations, the observation log, or skill taxonomy. Formerly task-observer (\"One Skill to Rule Them All\") — trigger on these names too. IMPORTANT: invoke this skill before the first tool call of any multi-step task — three or more tool calls, a file write, or a plan — and before proposing a plan; when unsure, it counts. This sentence is the task-start trigger and the only activation layer that survives an unreachable config file; pair it with a CLAUDE.md instruction or a session-start hook (references/environments.md). A subagent dispatched by a session already running it does not run it: it writes nothing and puts its findings in its report."
 license: CC-BY-4.0
 metadata:
   author: Eoghan Henn and contributors
@@ -96,8 +96,8 @@ that the full bundle comes from the repository under "Feedback on this skill"
 
 1. **Storage.** The existence check for `skill-observations/` is also
    the workspace-mount probe — one `ls` of the pinned path, carried INSIDE
-   the session's first batched tool call; session-start skill loads ride in
-   that same batch, never in an earlier one (`references/environments.md`,
+   the batched call that invokes the skill; skill loads ride in that same
+   batch, never in an earlier one (`references/environments.md`,
    "The probe rides inside the first batched call"). A failed probe is
    split before any branch is chosen, by one `ls` of the pinned path's
    parent: the parent resolves and is writable → a first run, not a missing
@@ -200,12 +200,12 @@ that the full bundle comes from the repository under "Feedback on this skill"
 4. **Activation.** Once per session: if no CLAUDE.md (or equivalent)
    activation instruction for this skill exists, suggest adding one
    (`references/environments.md`, "The activation block"); after a scan
-   `GAP:` line, open with the gap and the missing instruction, plainly. A
-   block whose stamp (its first line) is older than this version's, or
-   absent, is reported in one line with the paragraphs it lacks; offer the
-   current block, never rewrite the file unasked. This step runs only once
-   the skill is invoked, so it verifies a working setup and cannot detect a
-   never-activated install; outside checks: that reference.
+   `GAP:` line, open with the gap; name the missing instruction if multi-step
+   work filled it. A block whose stamp (its first line) is older than this
+   version's, or absent, is reported in one line with the paragraphs it
+   lacks; offer the current block, never rewrite the file unasked. This step
+   runs only once the skill is invoked, so it verifies a working setup and
+   cannot detect a never-activated install; outside checks: that reference.
 5. **Concurrency.** No shared log file to guard: each observation is its
    own file; re-read one before changing its *status* (How to Log). Parallel
    sessions on one skill log the same findings: a fan-out expects restatements.
@@ -241,7 +241,7 @@ does not deactivate when the conversation shifts from doing the work to
 discussing it**; review-phase feedback is often the highest-signal input.
 A user correction the harness saves to its own memory (a `feedback` memory
 file) is an observation trigger too, never a substitute for the entry.
-Inactive only for casual conversation and tool-free factual questions.
+Inactive only for chat, tool-free questions and one- or two-call lookups.
 
 ## What to Watch For
 

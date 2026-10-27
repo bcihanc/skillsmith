@@ -187,10 +187,10 @@ fi
 # --- gap: days since the previous session-start scan --------------------------
 # Read before this run's trace line is appended. The previous scan's date is
 # the last day a session ran the protocol; a gap of 7 days or more (the
-# review interval) while the user kept working is the one sign a skill that
-# stopped being activated can leave: the sessions in between never reached
-# the step that would say so. Day numbers come from awk, so no `date -d`
-# (GNU) or `date -j` (BSD) is needed. No earlier scan line: no note.
+# review interval) while the user kept doing multi-step work is the one sign
+# a skill that stopped being activated can leave: the sessions in between
+# never reached the step that would say so. Day numbers come from awk, so no
+# `date -d` (GNU) or `date -j` (BSD) is needed. No earlier scan line: no note.
 ck="$root/skill-observations/checkpoints.log"
 gap=$( [ -f "$ck" ] && LC_ALL=C awk -v today="$(date +%F)" '
   function dn(s,  y, m, d) { y = substr(s, 1, 4) + 0; m = substr(s, 6, 2) + 0; d = substr(s, 9, 2) + 0
@@ -198,7 +198,7 @@ gap=$( [ -f "$ck" ] && LC_ALL=C awk -v today="$(date +%F)" '
     return 365 * y + int(y / 4) - int(y / 100) + int(y / 400) + int((153 * (m - 3) + 2) / 5) + d }
   / session-start scan:/ && /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ { last = substr($ 0, 1, 10) }
   END { if (last != "") { g = dn(today) - dn(last); if (g >= 7) print last " " g } }' "$ck")
-[ -n "$gap" ] && { echo "GAP: the previous session-start scan ran ${gap% *}, ${gap#* } days ago. If work happened in between, the skill was not activated in those sessions: check the activation instruction (references/environments.md, \"Verify activation in a NEW session\")"; fx=$((fx + 1)); }
+[ -n "$gap" ] && { echo "GAP: the previous session-start scan ran ${gap% *}, ${gap#* } days ago. If multi-step work happened in between, the skill was not activated for it: check the activation instruction (references/environments.md, \"Verify activation in a NEW session\")"; fx=$((fx + 1)); }
 
 # --- the trace: one line per session, with date, time and source -------------
 printf '%s [%s] session-start scan: files=%s parsed=%s principles=%s\n' "$(date '+%F %H:%M')" "${PWD##*/}" "$n" "$parsed" "$pr" \

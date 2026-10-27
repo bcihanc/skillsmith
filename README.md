@@ -33,7 +33,7 @@ You work normally. It watches. Your skill library grows and gets better over tim
 
 ## The self-improving part
 
-This is the detail that makes Skillsmith truly beautiful in my opinion. Because it runs during every session and observes all active skills — including itself — it captures improvements to its own methodology over time.
+This is the detail that makes Skillsmith truly beautiful in my opinion. Because it runs during every multi-step task and observes all active skills — including itself — it captures improvements to its own methodology over time.
 
 If it misses something, or if its observation format could be clearer, or if it's triggering in contexts where it shouldn't — it notices, and it logs that too. The skill that improves all your skills also improves itself.
 
@@ -45,7 +45,7 @@ Skillsmith monitors your work sessions and looks for three things:
 2. **Gaps no skill covers yet** — if you're doing something manually or repeatedly that could be systematised, the observer flags it as a candidate for a new skill
 3. **Its own blind spots** — the observer watches itself too, capturing improvements to its own methodology as you use it
 
-During each session, it produces a structured observation log: what it noticed, which skills are affected, and specific suggested improvements. You review, approve, and your skills evolve.
+During each multi-step task, it produces a structured observation log: what it noticed, which skills are affected, and specific suggested improvements. You review, approve, and your skills evolve.
 
 Some observations reveal patterns that aren't specific to one skill. These get captured as **cross-cutting principles** in a separate log — and new skills are automatically checked against them whenever they're created or updated. The more you use the system, the higher the quality floor across your whole skill library.
 
@@ -89,7 +89,7 @@ The skill is a small bundle: `SKILL.md`, the files in `references/` that are loa
 
 **Vercel's skills CLI:** the skills.sh listing carries independent security audits from Gen Agent Trust Hub, Socket and Snyk.
 
-**Check that it actually runs.** Installing the files is not the same as activating the skill: description matching alone under-triggers, so add the activation instruction from `references/environments.md` to your CLAUDE.md (or your platform's equivalent) or install the session-start hook. Then verify in a *new* session — the session you install in cannot prove it — that the skill is invoked before the first tool call: open that session with ordinary work that does not mention the skill, because a request that names it invokes it by hand and proves nothing. The external tell if you skipped this: if `skill-observations/observation-log/` doesn't exist after a few sessions of real work, activation never happened. If it exists, read the last `session-start scan` line in `skill-observations/checkpoints.log`: that is the last session that ran the skill, so a date days old while you kept working means activation stopped, however many entries the first session wrote. Another skill's start-up text appearing in your sessions is not evidence that this one is active.
+**Check that it actually runs.** Installing the files is not the same as activating the skill: description matching alone under-triggers, so add the activation instruction from `references/environments.md` to your CLAUDE.md (or your platform's equivalent) or install the session-start hook. Then verify in a *new* session — the session you install in cannot prove it — that the skill is invoked before the first tool call: open that session with ordinary multi-step work (a small file edit, say) that does not mention the skill, because a request that names it invokes it by hand and proves nothing. The external tell if you skipped this: if `skill-observations/observation-log/` doesn't exist after a few sessions of multi-step work, activation never happened. If it exists, read the last `session-start scan` line in `skill-observations/checkpoints.log`: that is the last session that ran the skill, so a date days old while you kept doing multi-step working means activation stopped, however many entries the first session wrote. Another skill's start-up text appearing in your sessions is not evidence that this one is active.
 
 **Upgrading.** The activation block lives outside the bundle, in your CLAUDE.md or its equivalent, so an upgrade does not move it: its first line carries the version of the template it came from, and the skill reports a block older than its own version with the paragraphs it lacks. Re-diff the block against `references/environments.md` on every upgrade.
 

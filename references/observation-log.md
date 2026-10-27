@@ -1420,7 +1420,7 @@ still lands and the log looks compliant. A truncated scan is a skipped one.
    barrier for that shape is a harness hook at the turn boundary: in Claude
    Code the stop-hook recipe (`references/environments.md`, "A stop hook — the
    per-task backstop as a harness event"); where the harness offers plugin
-   hooks on turn completion, a hook that notes a turn which used tools and
+   hooks on turn completion, a hook that notes a multi-step turn that
    wrote nothing to `observation-log/` or `checkpoints.log`.
 2. *"Is this a major deliverable?" is a self-assessment, and self-assessment is
    what fails under load.* Prefer triggers unmistakable in the tool record over

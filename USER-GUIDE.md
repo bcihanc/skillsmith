@@ -43,9 +43,9 @@ Once you've started a Cowork task by giving your first instructions or some cont
 
 ## Dual-layer activation
 
-Skillsmith needs to be active at the start of a session to automatically log observations in the background, but you can always invoke it later and ask Claude to analyse the entire conversation for skill creation or improvement potentials. The skill can activate on its own by matching your task description against its triggers, but this isn't always reliable: Claude is mainly focused on your task, not on loading background skills.
+Skillsmith needs to be active at the start of a multi-step task to automatically log observations in the background, but you can always invoke it later and ask Claude to analyse the entire conversation for skill creation or improvement potentials. The skill can activate on its own by matching your task description against its triggers, but this isn't always reliable: Claude is mainly focused on your task, not on loading background skills.
 
-The more reliable approach is a dual-layer setup: the skill's own triggers plus a direct instruction in your CLAUDE.md file telling Claude to load Skillsmith at the start of every task-oriented session. Make sure that instruction says to run the skill's Session Start Protocol, not just to load the skill — loading and executing are separate steps, and a session that loads the file and then stops has activated nothing. The meta-skill itself will guide you towards setting this up, and the same approach works for any other skill you want to load consistently (so keep this in mind for the future).
+The more reliable approach is a dual-layer setup: the skill's own triggers plus a direct instruction in your CLAUDE.md file telling Claude to load Skillsmith before every multi-step task (use the block in `references/environments.md`). Make sure that instruction says to run the skill's Session Start Protocol, not just to load the skill — loading and executing are separate steps, and a session that loads the file and then stops has activated nothing. The meta-skill itself will guide you towards setting this up, and the same approach works for any other skill you want to load consistently (so keep this in mind for the future).
 
 ## How the skill works during a session
 

@@ -204,7 +204,7 @@ path — never in the repo, where the installed copy and the published
 tree would diverge at once.
 
 **A reference file is shaped by its TRIGGERS, not its line count.** The
-core is loaded in full every session, so a line there taxes every
+core is loaded in full at every activation, so a line there taxes every
 consumer; a reference file loads only when its episode fires, so a long
 file that loads rarely is cheap and the core's ceiling does not transfer.
 The rule: a reference file serves one episode, or a set of episodes that
@@ -423,9 +423,9 @@ review; skillsmith automates that capture and review; and
 benchmarked-optimisation tools, which score a skill against a test set,
 complement it. Its attribution block carries the canonical-source line,
 `metadata.source` as in the template above, which is what lets a
-downstream user route a finding upstream. SKILL.md, loaded every session,
-gets at most a one-line pointer to the README section. No "scaffolded
-with" footer: it serves the author, not the reader, and forks strip it.
+downstream user route a finding upstream. SKILL.md, loaded on every
+activation, gets one pointer line to the README section at most. No
+"scaffolded with" footer: it serves the author, not the reader; forks strip it.
 
 **Distribution-channel note:** the template's feedback routing assumes
 public-repo distribution. Reference a repository URL only once that
