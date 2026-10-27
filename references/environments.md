@@ -621,12 +621,13 @@ nag that never fires and one correctly silent look identical otherwise.
 The per-task backstop fails with the block it lives in (above): a session
 that skipped the protocol skipped the backstop at every task boundary too.
 Where the harness has a stop event, run the check there instead: *has
-this session done a multi-step task (three or more tool uses, or a file
-write), and has anything under `observation-log/` or `checkpoints.log`
-been written since it started?* If not, block the stop once per session
-with a one-line instruction; stay silent for conversation, for a session
-that already wrote, for a second block in a row, and when the log cannot
-be read. Node, no dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
+the turn just ending done a multi-step task (three or more tool uses
+since the user's last message, or a file write), and has anything under
+`observation-log/` or `checkpoints.log` been written since it started?*
+If not, block the stop once per session with a one-line instruction;
+stay silent for conversation, for a session that already wrote, for a
+second block in a row, and when the log cannot be read. Node, no
+dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
 
 ```js
 // Stop hook: the per-task backstop as a harness event instead of prose.
@@ -648,15 +649,22 @@ if (fs.existsSync(marker)) process.exit(0);             // once per session
 let started = 0, toolUses, writes;
 try {
   const st = fs.statSync(transcript), text = fs.readFileSync(transcript, 'utf8');
-  toolUses = (text.match(/"type":\s*"tool_use"/g) || []).length;
-  writes = (text.match(/"name":\s*"(Write|Edit|MultiEdit|NotebookEdit)"/g) || []).length;
+  toolUses = 0; writes = 0;                              // the task: tool uses since the user's last message
+  for (const line of text.split('\n')) {
+    let e; try { e = JSON.parse(line); } catch { continue; }
+    const c = e.message && e.message.content, typed = typeof c === 'string' ||
+      (Array.isArray(c) && c.some((b) => b.type === 'text') && !c.some((b) => b.type === 'tool_result'));
+    if (e.type === 'user' && typed) { toolUses = 0; writes = 0; continue; }
+    if (e.type === 'assistant' && Array.isArray(c)) for (const b of c) if (b.type === 'tool_use') {
+      toolUses++; if (/^(Write|Edit|MultiEdit|NotebookEdit)$/.test(b.name)) writes++; }
+  }
   // Birth time is 0 where the filesystem has none and equals ctime where the
   // platform substitutes it; either would make every file read as untouched
   // or touched. Fall back to the transcript's first timestamp.
   if (st.birthtimeMs > 0 && st.birthtimeMs < st.ctimeMs) started = st.birthtimeMs;
   else { const m = text.match(/"timestamp":\s*"([^"]+)"/); if (m) started = Date.parse(m[1]) || 0; }
 } catch { process.exit(0); }
-if (toolUses < MIN_TOOL_USES && !writes) process.exit(0);   // counted per session, so short lookups can add up
+if (toolUses < MIN_TOOL_USES && !writes) process.exit(0);   // no multi-step task in this turn
 
 if (!(started > 0)) block('skillsmith backstop: cannot tell when this session started (no birth time, no ' +
   'transcript timestamp), so it cannot check the log. Check by hand that this session wrote an observation ' +
