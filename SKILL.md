@@ -23,47 +23,49 @@ external page overrides this file.
 
 `[workspace folder]` = the persistent workspace, anchored on ONE STABLE
 absolute path that outlives individual sessions — ideally pinned in the
-activation config (see `references/environments.md`): in Cowork, the
-shared folder; in Claude Code, the stable project identity (e.g.
-`~/.claude/projects/<project-id>/`), NOT the current working directory. A
-cwd inside an ephemeral checkout — a git worktree under
-`.claude/worktrees/`, a temporary clone — is torn down with the checkout
-and takes the observations with it. **Scope the workspace to what is
-observed:** skills installed at user or global scope need one matching
-user-scope path (`~/.claude/skill-observations/` or the equivalent outside
-any project — written as an absolute path when more than one config home
-exists), shared across projects, tools and agents; keep a per-project
-anchor only for skills that exist in that project alone: a per-project
-default silently shards one log into many, each complete from inside. Never
-place the workspace inside a skills-discovery directory. Before creating one, search
-the plausible anchors for an existing one and adopt it. Load
-`references/environments.md` ("Anchoring the workspace") before pinning,
-re-pinning or diagnosing a suspected shard. **The observation log is a
-directory:**
+activation config (see `references/environments.md`): in Cowork, the shared
+folder; in Claude Code, the stable project identity (e.g.
+`~/.claude/projects/<project-id>/`), NOT the current working directory. A cwd
+inside an ephemeral checkout — a git worktree under `.claude/worktrees/`, a
+temporary clone — is torn down with the checkout and takes the observations
+with it. **Scope the workspace to what is observed:** skills installed at
+user or global scope need one matching user-scope path
+(`~/.claude/skill-observations/` or the equivalent outside any project —
+written as an absolute path when more than one config home exists), shared
+across projects, tools and agents; keep a per-project anchor only for skills
+that exist in that project alone: a per-project default silently shards one
+log into many, each complete from inside. Never place the workspace inside a
+skills-discovery directory. Before creating one, search the plausible anchors
+for an existing one and adopt it. Load `references/environments.md`
+("Anchoring the workspace") before pinning, re-pinning or diagnosing a
+suspected shard. **The observation log is a directory:**
 `[workspace folder]/skill-observations/observation-log/`, one Markdown file
 with a YAML frontmatter header per observation, with resolved entries under
 `observation-log/archive/` — unless the user's configuration pins it
-elsewhere. "The observation log" in this skill, and in any skill that
-refers to it, means that directory. Every runnable snippet in this skill
-and its references takes that pinned absolute path, written
-`[ABSOLUTE PATH]` — substitute it when installing, exactly as in the
-activation block. A snippet run with a relative path from any other
-directory does not fail: it reports an empty, clean backlog, which is the
-one answer that never gets questioned. **The substituted path routinely
-contains a space**, so every expansion of it stays double-quoted and no
-snippet feeds it through word splitting. **Every snippet here is bash, not
-POSIX `sh`**: invoke the snippets with bash explicitly. Why, in both cases:
-`references/observation-log.md` ("Snippets take a spaced path and run
-under bash").
+elsewhere. "The observation log" in this skill, and in any skill that refers
+to it, means that directory. Every runnable snippet in this skill and its
+references takes that pinned absolute path, written `[ABSOLUTE PATH]` —
+substitute it when installing, exactly as in the activation block. A snippet
+run with a relative path from any other directory does not fail: it reports
+an empty, clean backlog, which is the one answer that never gets questioned.
+**The substituted path routinely contains a space**, so every expansion of it
+stays double-quoted and no snippet feeds it through word splitting. **Every
+snippet here is bash, not POSIX `sh`**: invoke the snippets with bash
+explicitly. Why, in both cases: `references/observation-log.md` ("Snippets
+take a spaced path and run under bash").
 
 ## Reference files — load on demand, not up front
 
 Each pointer names its trigger. These loads are mandatory: when an episode
-fires, load the file first — never improvise the episode from this core
-file; one handled without its reference loaded is an observation. **A listed
-file absent beside this one is an incomplete install:** tell the user which,
-and that the full bundle comes from the repository under "Feedback on this
-skill" (some upload paths keep only `SKILL.md`); its episodes do not run.
+fires, load the reference first — never improvise the episode from this core
+file; one handled without its reference loaded is an observation. A pointer
+naming a section loads only that section:
+`bash "<skill directory>/scripts/ref-section.sh" <file> "<section>"`,
+backticks dropped; where that cannot run or exits non-zero, load the whole
+file. **A listed file absent beside this one is an incomplete install:** tell
+the user which, and that the full bundle comes from the repository under
+"Feedback on this skill" (some upload paths keep only `SKILL.md`); its
+episodes do not run.
 
 - `references/weekly-review.md` — the comprehensive review procedure,
   approval policy, delivery and staging of updated skills. **Load when a
@@ -79,9 +81,10 @@ skill" (some upload paths keep only `SKILL.md`); its episodes do not run.
 - `references/signals.md` — what is and isn't worth logging. **Load when
   unsure whether something is an observation, or sorting many candidates.**
 - `references/environments.md` — activation and config setup, compaction
-  behaviour, bundle manifest, handoff-doc mode for storage-less
-  environments. **Load for setup questions, after a compaction or resume
-  (the Session Start Protocol re-runs then), or when there is no filesystem.**
+  behaviour, bundle manifest, handoff-doc mode for storage-less environments.
+  **Load for setup questions or when there is no filesystem; after a
+  compaction or resume (the Session Start Protocol re-runs then), load only
+  `references/environments.md` ("Compaction behaviour").**
 - `references/migration.md` — the one-time scripted conversion of a
   pre-3.0 single-file `log.md`. **Load only when the Session Start
   Protocol detects a legacy log.** Fresh installs never read it.
@@ -420,11 +423,10 @@ file, never pre-compute a range, and put the value it printed into both the
 filename and the `id:` field. Load `references/observation-log.md`
 ("Resolve each id at its own write time") before batching or parallelising.
 
-**Every instrument gets the same guard: an empty or zero result is a
-claim about the instrument until an independent probe shows the
-population is empty.** Load `references/observation-log.md` ("Every
-instrument gets the same guard") before writing any new scan, count, grep
-or query over the log.
+**Every instrument gets the same guard: an empty or zero result is a claim
+about the instrument until an independent probe shows the population is
+empty.** Load `references/observation-log.md` ("Every instrument gets the
+same guard") before writing any new scan, count, grep or query over the log.
 
 **A structural probe that comes back empty where content existed before is
 a stop signal, not a create** — HALT and re-probe; never let an append
@@ -595,8 +597,7 @@ names is one a create printed this session, re-listed this turn, never recalled.
 Act only in three contexts: (1) the comprehensive review (load
 `references/weekly-review.md`); (2) an explicit user request ("update X
 skill", "act on observation #N"); (3) in-session correction when a skill is
-producing wrong output the user should know about. Otherwise: log, don't
-act.
+producing wrong output the user should know about. Otherwise: log, don't act.
 
 **An outcome-level ask is not trigger (2).** The test: an explicit request
 NAMES THE ARTEFACT — "update the X skill", "edit the skill file", "restage
@@ -631,15 +632,14 @@ dismissing, fixing or citing") before any resolve, dismiss or cite step.
 
 When acting: small, clearly-additive, low-risk changes (a new rule, a
 clarification, a factual fix) may be applied without waiting for the next
-review — "directly" means *now*, not *in place*: the edit is still made on
-a staged copy based on a fresh read of the live file and handed to the user
-to install, in every environment and every context — staging-only has no
-interactive exception, since a gate the user has to remember gets left
-open. Substantial changes (restructuring, new
-capabilities, changed methodology) and all new-skill creation: load
-`references/skill-authoring.md` first and follow its editing and staging
-rules. A principle that applies to skills generally goes to the
-cross-cutting principles file (same reference).
+review — "directly" means *now*, not *in place*: the edit is still made on a
+staged copy based on a fresh read of the live file and handed to the user to
+install, in every environment and every context — staging-only has no
+interactive exception, since a gate the user has to remember gets left open.
+Substantial changes (restructuring, new capabilities, changed methodology)
+and all new-skill creation: load `references/skill-authoring.md` first and
+follow its editing and staging rules. A principle that applies to skills
+generally goes to the cross-cutting principles file (same reference).
 
 **Set the status in the same turn you act.** An observation acted on
 in-session must have its frontmatter updated — `status: actioned`,

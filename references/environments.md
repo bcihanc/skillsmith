@@ -768,12 +768,12 @@ console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', 
     'before writing a skill file; this write is allowed once that Read has run.' } }));
 ```
 
-Its limits: it sees the file tools only, so a skill file written through
-a shell command passes; the marker outlives a compaction that drops the
-reference from context (re-read it after one, as the Session Start
-Protocol already says); and like every trigger it is armed only once it
-has matched the real event — run a `SKILL.md` write before the read
-(denied), then a read of the reference and the same write (allowed).
+Its limits: it sees the file tools only, so a skill file written through a
+shell command passes; the marker outlives a compaction that drops the
+reference from context (re-read it after one: "Compaction behaviour"); and
+like every trigger it is armed only once it has matched the real event — run
+a `SKILL.md` write before the read (denied), then a read of the reference
+and the same write (allowed).
 
 ### Verify activation in a NEW session — the installing session cannot prove it
 
@@ -1682,10 +1682,10 @@ regimes:
 
 This skill consists of `SKILL.md`, the reference files it lists
 (`weekly-review.md`, `skill-authoring.md`, `environments.md`,
-`observation-log.md`, `signals.md`, `migration.md`,
-`starter-principles.md`) and `scripts/migrate-log.py`,
-`scripts/new-observation.sh`, `scripts/session-start-scan.sh`,
-`scripts/skill-load.sh` and `scripts/validate-skill-bundle.py`. If any is
+`observation-log.md`, `signals.md`, `migration.md`, `starter-principles.md`)
+and `scripts/migrate-log.py`, `scripts/new-observation.sh`,
+`scripts/session-start-scan.sh`, `scripts/skill-load.sh`,
+`scripts/ref-section.sh` and `scripts/validate-skill-bundle.py`. If any is
 missing, SKILL.md "Reference files" applies (the rule lives there because
 this file can be the missing one). `references/ceilings.txt` travels with
 them: it holds the per-file line ceilings the validator reads.
@@ -1721,16 +1721,18 @@ salient about the *work*; skill loads are infrastructure, not work, so they
 are exactly what a summary drops, and the block's "shown here for context
 only" describes what it contains, not what the session has. Re-derive the
 skill set from the task (name the decision, name the artefact type, match
-the installed descriptions — "Select on the decision, not on the artefact"
-above), and treat any skill the summary lists as loaded-then-forgotten
-rather than as the whole set.
+the installed descriptions — the activation block's skill-selection
+paragraph, which the compaction keeps), and treat any skill the summary
+lists as loaded-then-forgotten rather than as the whole set.
 
-Observations before and after compaction are separate files under the
-same `observation-log/`, each with its own id (the counter is derived
-from existing filenames, so it continues across the boundary). A resumed
-session's opening message may not match the description triggers, which
-is one reason the protocol re-runs by rule rather than by whichever
-trigger happens to fire.
+Observations before and after compaction are separate files under the same
+`observation-log/`, each with its own id (the counter is derived from
+existing filenames, so it continues across the boundary). A resumed
+session's opening message may not match the description triggers, which is
+one reason the protocol re-runs by rule rather than by whichever trigger
+happens to fire. A skill-file write after a compaction re-reads
+`references/skill-authoring.md` first: the write gate's marker outlives the
+compaction, the reference in context does not.
 
 ## User-facing documentation
 

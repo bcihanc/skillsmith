@@ -3,7 +3,7 @@
 # Over its ceiling, a file with more than 12 load triggers is split by episode;
 # one with 12 or fewer is trimmed, or its ceiling raised with a dated reason.
 # A ceiling more than 3 lines above its file's count is lowered to the count.
-environments.md 1856 2026-10-26 scheduler and completion checks, an overdue review logged once, several config homes, project start-up for started sessions, harness memory in the backfill
+environments.md 1858 2026-10-27 the compaction section carries the skill-authoring re-read, since a compaction now loads that section alone
 migration.md 262 2026-10-16 the test branch: the split store, a log.md beside the observation directory
 observation-log.md 1451
 signals.md 234

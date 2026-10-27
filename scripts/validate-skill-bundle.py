@@ -557,7 +557,10 @@ def check_reference_indexes(skill_dir, fails):
     # (`references/x.md`, "Heading"). The second form was invisible to this
     # check, so its targets went unverified. A pointer may name a heading up
     # to its ` — ` qualifier, as a Contents entry may.
+    import shutil
+    import subprocess
     named, _ = core_pointers(core)
+    section_script = skill_dir / "scripts" / "ref-section.sh"
     for fname in sorted(named):
         target = refs / fname
         if not target.is_file():
@@ -568,6 +571,15 @@ def check_reference_indexes(skill_dir, fails):
         for heading in sorted(named[fname]):
             if not any(h == heading or h.startswith(heading + " — ") for h in heads):
                 fails.append(f"SKILL.md pointer has no target heading: {fname} -> {heading!r}")
+            elif shutil.which("bash") and section_script.is_file():
+                # The load is the script's read, not this check's, so the gate runs
+                # the script itself: a heading this check finds can still be one the
+                # script refuses (a duplicate at another level) or cuts short.
+                r = subprocess.run(["bash", str(section_script), str(target), heading.replace("`", "")],
+                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
+                if r.returncode != 0:
+                    fails.append(f"SKILL.md pointer does not load through scripts/{section_script.name}: "
+                                 f"{fname} -> {heading!r}: {r.stderr.strip()}")
 
 
 # --- Reference-file growth barrier ---------------------------------------------
@@ -1275,6 +1287,56 @@ LOAD_FIXTURES = [
 ]
 
 
+# scripts/ref-section.sh, the reader for a pointer that names a section:
+# (name, heading, exit status, output substring, output substring that must
+# be ABSENT). A section loaded short of its text is a rule silently skipped,
+# so the boundary cases pin where a section ends; a missing or doubled
+# heading must fail, never print a guess.
+SECTION_SCRIPT = pathlib.Path(__file__).resolve().parent / "ref-section.sh"
+SECTION_DOC = ("# Doc\n\n## Contents\n\n- Alpha\n- Beta\n\n## Alpha\n\nalpha text\n"
+               "### Alpha child\nchild text\n```bash\n## Not a heading inside a fence\n```\n"
+               "fence passed\n## Beta\nbeta text\n## Dup\none\n## Dup\ntwo\n"
+               "## Qual — what it covers\nqual text\n"
+               "## Outer\n````markdown\n```bash\n## fenced in a template\n```\n````\nouter end\n"
+               "## Tilde\n```\n~~~\n```\ntilde end\n## The `parked` status\nparked text\n"
+               "## C#\nsharp text\n")
+SECTION_FIXTURES = [
+    ("a section keeps its children and runs past a fenced '##' line", "Alpha", 0,
+     "child text\n```bash\n## Not a heading inside a fence\n```\nfence passed\n", "beta text"),
+    ("a child section ends at the next heading of its level or higher", "Alpha child", 0,
+     "### Alpha child\nchild text", "## Beta"),
+    ("the Contents entry is not the section", "Beta", 0, "## Beta\nbeta text\n", "- Alpha"),
+    # the validator accepts a pointer that names a heading up to its " — " qualifier
+    ("a pointer may stop at the heading's ' — ' qualifier", "Qual", 0, "qual text", "two"),
+    # a fence closes only on its own character, at least as long (the bundle check's rule)
+    ("a longer fence holding a shorter one stays open", "Outer", 0, "````\nouter end\n", "Tilde"),
+    ("a ~~~ line inside a ``` block is content", "Tilde", 0, "```\ntilde end\n", "parked text"),
+    # the shell runs a backticked word inside double quotes, so a caller drops them
+    ("a heading with backticks matches the name without them", "The parked status", 0,
+     "parked text", "sharp text"),
+    ("a trailing # is part of the heading", "C#", 0, "sharp text", "NO SECTION"),
+    ("a missing heading fails, printing nothing of the file", "Gamma", 1, "NO SECTION", "text"),
+    ("a doubled heading fails, printing nothing of the file", "Dup", 1, "AMBIGUOUS", "one"),
+]
+
+
+def section_case(heading, arg="doc.md"):
+    """Run ref-section.sh from outside the skill, with a bare name or a pointer's
+    `references/doc.md`, both resolved beside the script's references/ directory;
+    return (status, stdout + stderr)."""
+    import shutil
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        skill = pathlib.Path(tmp) / "a skill"
+        (skill / "scripts").mkdir(parents=True)
+        (skill / "references").mkdir()
+        shutil.copy(SECTION_SCRIPT, skill / "scripts" / SECTION_SCRIPT.name)
+        (skill / "references" / "doc.md").write_text(SECTION_DOC, encoding="utf-8")
+        r = subprocess.run(["bash", str(skill / "scripts" / SECTION_SCRIPT.name), arg, heading],
+                           cwd=tmp, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        return r.returncode, r.stdout + r.stderr
+
+
 def load_case(skill, absolute, scenario=""):
     import os
     import subprocess
@@ -1539,6 +1601,24 @@ def selftest():
     elif shutil.which("bash"):
         bad += 1; total += 1
         print(f"FAIL skill-load script: {LOAD_SCRIPT.name} missing beside this file")
+    if shutil.which("bash") and SECTION_SCRIPT.is_file():
+        ok = subprocess.run(["bash", "-n", str(SECTION_SCRIPT)]).returncode == 0
+        bad += not ok; total += 1
+        print(f"{'ok  ' if ok else 'FAIL'} section script: bash -n passes")
+        for name, heading, want_rc, want_out, absent in SECTION_FIXTURES:
+            rc, out = section_case(heading)
+            ok = rc == want_rc and want_out in out and absent not in out
+            bad += not ok; total += 1
+            print(f"{'ok  ' if ok else 'FAIL'} section script: {name}"
+                  + ("" if ok else f" (exit {rc}, out {out!r})"))
+        rc, out = section_case("Beta", "references/doc.md")
+        ok = rc == 0 and "beta text" in out
+        bad += not ok; total += 1
+        print(f"{'ok  ' if ok else 'FAIL'} section script: a pointer's references/ path resolves from any directory"
+              + ("" if ok else f" (exit {rc}, out {out!r})"))
+    elif shutil.which("bash"):
+        bad += 1; total += 1
+        print(f"FAIL section script: {SECTION_SCRIPT.name} missing beside this file")
     if MIGRATE_SCRIPT.is_file():
         for name, skill_line, ov, want_rc, has, lacks in MIGRATE_FIXTURES:
             rc, text = migrate_case(skill_line, ov)
