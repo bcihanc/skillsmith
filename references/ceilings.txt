@@ -3,7 +3,7 @@
 # Over its ceiling, a file with more than 12 load triggers is split by episode;
 # one with 12 or fewer is trimmed, or its ceiling raised with a dated reason.
 # A ceiling more than 3 lines above its file's count is lowered to the count.
-environments.md 1866 2026-10-27 activation narrowed to multi-step tasks: the block, its rationale, the stop hook and the start-up probe say what triggers it
+environments.md 1871 2026-10-28 caller-owned sessions skip offers by property, the starter-set and backfill offers named, after a live worker run met both
 migration.md 262 2026-10-16 the test branch: the split store, a log.md beside the observation directory
 observation-log.md 1451
 signals.md 234

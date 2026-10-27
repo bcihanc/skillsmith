@@ -801,7 +801,7 @@ result tells you about the instrument before the library.
 
 ```bash
 root="[PROJECTS ROOT]"   # absolute path of the directory holding the user's repositories
-[ -d "$root" ] || { echo "SWEEP BROKEN — projects root $root does not exist"; exit 1; }
+[ -n "$BASH_VERSION" ] || { echo "SWEEP BROKEN — not bash: zsh aborts the glob and reports 0"; exit 1; }; [ -d "$root" ] || { echo "SWEEP BROKEN — projects root $root does not exist"; exit 1; }
 list=$(for d in "$root"/*/.claude/skills/*/ "$root"/*/*/.claude/skills/*/; do [ -f "$d/SKILL.md" ] && echo "${d%/}"; done)
 n=$(printf '%s\n' "$list" | grep -c .); p=$(for d in "$root"/*/ "$root"/*/*/; do [ -d "$d" ] && echo; done | wc -l | tr -d ' ')
 echo "project skills: $n (in $p directories under $root, two levels deep)"

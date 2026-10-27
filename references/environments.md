@@ -1580,13 +1580,18 @@ A subagent, a non-interactive run, a tool-shaped invocation with a
 declared result schema: the session has a filesystem and no reader.
 Detect it from the session's own contract — a single required result
 call, a ban on free-text answers — never from a flag. Every step that
-needs a free-text reply to a person has no recipient there: the review
-offer (Session Start step 3), the activation suggestion (step 4), the
-end-of-session summary (Surfacing Protocol) and the per-task summary line
-in the activation block. Skip them silently, and never count an
-unanswerable offer as surfaced. Never run the review unprompted either:
-"autonomous" in step 3 means a scheduled run whose prompt asks for the
-review, not a worker whose caller asked for something else.
+needs a free-text reply to a person has no recipient there — the
+property decides, the list only illustrates: the starter-set and
+first-run backfill offers (Session Start steps 1 and 7), the review
+offer (step 3), the activation suggestion (step 4), the end-of-session
+summary (Surfacing Protocol) and the per-task summary line in the
+activation block. Skip them silently, write none of their markers, so
+each offer returns in the next interactive session, and never count an
+unanswerable offer as surfaced. A worker whose questions route through a
+coordinator is such a session for offers, even when a person watches its
+terminal. Never run the review unprompted either: "autonomous" in step 3
+means a scheduled run whose prompt asks for the review, not a worker
+whose caller asked for something else.
 
 What happens to logging depends on who the caller is. Where the caller
 is itself a session running this protocol, the activation block's
