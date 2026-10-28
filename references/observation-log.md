@@ -851,30 +851,30 @@ The snippet leaves the derived number in `$next_id` and the target path in
 `$f`; append `printf '%04d\n' "$next_id"` if you also want the filename
 prefix echoed.
 
-**`bash scripts/new-observation.sh [--body <file>] <slug> [workspace-root]`
+**`bash "<skill directory>/scripts/new-observation.sh" [--body <file>] <slug> [workspace-root]`
 is this snippet as one command.** It performs the same steps in the same
-order — sweep, id, prefix guard, noclobber create, floor write — plus one
-the inline snippet lacks: before the prefix guard it claims the number
-with a noclobber create of an empty marker in `archive/.id-claims/`,
-moving up one when the claim is taken, so two runs at the same moment
-never share an id. Markers are never removed (no delete permission
-needed); one left by an interrupted run only leaves a gap. Its create is
-never an empty file: it writes the frontmatter skeleton — `id:` (the
-number, unpadded), `date:`, `status: open`, every other field present and
-empty — so the id is on disk before anything can retype it and a scan
-that meets the file mid-write reports it UNFILLED (a header with an empty
-`title:`), never LOST; `--body <file>` builds the filled copy beside it
-and renames it into place, so the file holds the skeleton or the whole
-body, never a part, and a `NOTE:` on stderr names a body whose `id:` is
-not the one issued. It takes the pinned workspace root as its second
-argument or from `SKILLSMITH_WORKSPACE`, refuses a relative root, a
-malformed slug or a missing `observation-log/archive/` (halt and
-re-probe; never recreate from a writer), and prints the created path on
-stdout. Where it can run, it is the only write path: an id that exists
-only as the script's output cannot be carried in memory from an earlier
-read to a later write, which is the drift every rule in this section is
-trying to prevent. The inline snippet remains for harnesses where a
-script cannot be invoked.
+order — sweep, id, prefix guard, noclobber create, floor write — plus
+one the inline snippet lacks: before the prefix guard it claims the
+number with a noclobber create of an empty marker in
+`archive/.id-claims/`, moving up one when the claim is taken, so two
+runs at the same moment never share an id. Markers are never removed (no
+delete permission needed); one left by an interrupted run only leaves a
+gap. Its create is never an empty file: it writes the frontmatter
+skeleton — `id:` (the number, unpadded), `date:`, `status: open`, every
+other field present and empty — so the id is on disk before anything can
+retype it and a scan that meets the file mid-write reports it UNFILLED
+(a header with an empty `title:`), never LOST; `--body <file>` builds
+the filled copy beside it and renames it into place, so the file holds
+the skeleton or the whole body, never a part, and a `NOTE:` on stderr
+names a body whose `id:` is not the one issued. It takes the pinned
+workspace root as its second argument or from `SKILLSMITH_WORKSPACE`,
+refuses a relative root, a malformed slug or a missing
+`observation-log/archive/` (halt and re-probe; never recreate from a
+writer), and prints the created path on stdout. Where it can run, it is
+the only write path: an id that exists only as the script's output
+cannot be carried in memory from an earlier read to a later write, which
+is the drift every rule in this section is trying to prevent. The inline
+snippet remains for harnesses where a script cannot be invoked.
 
 The `10#` prefix in the arithmetic is load-bearing, not cosmetic: shell
 arithmetic reads a leading-zero number as octal, so `$(( 0105 + 1 ))`
