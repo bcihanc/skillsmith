@@ -115,7 +115,7 @@ prog='function bare(t) { sub(/.*:/, "", t); sub(/.*\//, "", t); return t }
                     inl = (v ~ /^[[:space:]]*$/); gsub(/[][]/, "", v)
                     n = split(v, a, ","); for (i = 1; i <= n; i++) if (tok(a[i])) sk = 1
                     next }
-  fm && inl && /^[[:space:]]*-[[:space:]]/ { v = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", v); if (tok(v)) sk = 1; next }
+  fm && inl && /^[[:space:]]*-[[:space:]]/ { v = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); if (tok(v)) sk = 1; next }
   fm && /^[A-Za-z_]/ { inl = 0 }
   fm && /^status:[[:space:]]*["\047]?(actioned|declined|superseded|parked)["\047]?[[:space:]]*(#.*)?$/ { rs = 1 }'
 
