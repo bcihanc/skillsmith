@@ -17,7 +17,7 @@ here takes effect until the adopter consciously imports it.
 SKILL.md step 1 points here for the whole procedure; it carries only the
 trigger and the one-line summary. Read both numbers from this file: the
 version is its `Starter set version:` line, N is
-`grep -E -c '^### [0-9]+\.' references/starter-principles.md`.
+`grep -E -c '^### [0-9]+\.' "<skill directory>/references/starter-principles.md"`.
 
 **When to read this file:** only when the Session Start Protocol
 (SKILL.md, step 1) finds the starter-set reconciliation due — the marker
