@@ -562,12 +562,12 @@ and inject it rather than asking the agent to go and look:
 #!/bin/sh
 # SessionStart hook: inject activation + review state as additionalContext.
 d="$OBS_WORKSPACE/skill-observations"      # the pinned absolute path
-open=$(find "$d/observation-log" -maxdepth 1 -name '[0-9]*.md' -exec awk 'FNR==1 {sub(/^\357\273\277/, ""); fm=/^---[[:space:]]*$/; if (!fm) {print; nextfile}; next} fm && /^---[[:space:]]*$/ {print; nextfile} fm && /^status:/ {v=$2; gsub(/["\047\r]/, "", v); if (v !~ /^(actioned|declined|superseded|parked)$/) print; nextfile}' {} + 2>/dev/null | wc -l | tr -d ' ')   # a line per OPEN entry: a missing, quoted or CRLF status still reads
+o="$d/observation-log"; open=$(( $(find "$o" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l) - $(LC_ALL=C find "$o" -maxdepth 1 -name '*.md' ! -empty -exec awk 'FNR==1 {sub(/^\357\273\277/, ""); fm=/^---[[:space:]]*$/; if (!fm) nextfile; next} fm && /^---[[:space:]]*$/ {nextfile} fm && /^status:/ {v=$2; gsub(/["\047\r]/, "", v); if (v ~ /^(actioned|declined|superseded|parked)$/) print FILENAME; nextfile}' {} + 2>/dev/null | wc -l) ))   # every entry minus the resolved and parked: an empty, headerless or statusless file is open; LC_ALL=C or a UTF-8 awk keeps the BOM
 last=$(tr -d '\r' 2>/dev/null < "$d/last-review-date.txt"); last=${last:-never}   # a CRLF file must not carry \r into the JSON
 msg="Before the first tool call of a multi-step task (three or more tool calls, a file write, or a plan), make that call one batched call that both lists the skillsmith workspace ($OBS_WORKSPACE) and invokes the skillsmith skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
 msg="$msg $open open observations in $d; last review: $last."   # always, zero included: a mispinned path reads 0 too
 if [ "$open" -gt 0 ]; then
-  cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F 2>/dev/null || date -d "@$(( $(date +%s) - 604800 ))" +%F)   # GNU, BSD/macOS, then busybox
+  cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F 2>/dev/null || date -d "@$(( $(date -d "$(date +%F) 12:00" +%s) - 604800 ))" +%F)   # GNU, BSD/macOS, then busybox, from today's noon so a DST change cannot shift the day
   case "$last" in
     (never) msg="$msg Offer the review." ;;
     (*) [ "$(printf '%s\n%s\n' "$last" "$cutoff" | sort | head -1)" = "$last" ] && msg="$msg Offer the review." ;;
@@ -598,11 +598,11 @@ Microsoft Store stub under `WindowsApps`, and neither runs the hook.
 Register the hook with the interpreter's full path (for Python, `py -0p`
 lists the real installs; skip any `WindowsApps` path).
 
-The count is of entries not resolved or parked (the review's OPEN set),
-not of files in the directory. Resolved entries deliberately stay in
-`observation-log/` until the day after they were resolved (the grace
-period lives in the file, not in session memory), and parked entries are
-decided and out of the work queue, so a raw file count overstates the
+The count is the review's OPEN set: every file but the `actioned`,
+`declined`, `superseded` and `parked` ones. Resolved entries deliberately
+stay in `observation-log/` until the day after they were resolved (the
+grace period lives in the file, not in session memory), and parked entries
+are decided and out of the work queue, so a raw file count overstates the
 backlog by every entry the last review just closed, for a day, in every
 session. Compare dates without `<` in `[ ]`: ISO dates sort lexically, so
 `[ "$(printf '%s\n%s\n' "$last" "$cutoff" | sort | head -1)" = "$last" ]`
