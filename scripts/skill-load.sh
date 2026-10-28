@@ -111,7 +111,7 @@ prog='function bare(t) { sub(/.*:/, "", t); sub(/.*\//, "", t); return t }
   FNR == 1 { fm = 0; sk = 0; rs = 0; inl = 0; sub(/^\357\273\277/, "")
              if ($0 ~ /^---[[:space:]]*$/) { fm = 1; next } else nextfile }
   fm && /^---[[:space:]]*$/ { print "H " FILENAME; if (sk && !rs) print "M " FILENAME; nextfile }
-  fm && /^(skill|target_file):/ { v = $0; sub(/^(skill|target_file):[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v)
+  fm && /^(skill|target_file):/ { v = $0; sub(/^(skill|target_file):[[:space:]]*/, "", v); sub(/(^|[[:space:]]+)#.*$/, "", v)
                     inl = (v ~ /^[[:space:]]*$/); gsub(/[][]/, "", v)
                     n = split(v, a, ","); for (i = 1; i <= n; i++) if (tok(a[i])) sk = 1
                     next }
