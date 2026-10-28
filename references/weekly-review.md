@@ -551,9 +551,9 @@ nonconf=$(LC_ALL=C find "$d" -maxdepth 1 -name '*.md' -exec awk '
     if (st !~ /^(open|actioned|declined|superseded|parked)$/) bad=bad " status"
     if (sc == "") bad=bad " siblings_checked"
     if (bad != "") print FILENAME ":" bad; nextfile }
-  fm && /^id:/ { idv=$2 }
-  fm && /^status:/ { st=$2 }
-  fm && /^siblings_checked:/ { sc=$0; sub(/^siblings_checked:[[:space:]]*/, "", sc) }
+  fm && /^id:/ { idv=$2; gsub(/["\047\r]/, "", idv) }
+  fm && /^status:/ { st=$2; gsub(/["\047\r]/, "", st) }
+  fm && /^siblings_checked:/ { sc=$0; sub(/^siblings_checked:[[:space:]]*/, "", sc); gsub(/["\047\r]/, "", sc); sub(/[[:space:]]+$/, "", sc) }
   fm && /^(skills|proposed_skill|proposed_skills|proposes_skills|sibling_checked|siblings_check|target_files|skill_qualifier):/ { bad=bad " near-miss:" $1 }
 ' {} +)
 n_nc=$(printf '%s' "$nonconf" | grep -c .)

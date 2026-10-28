@@ -1290,6 +1290,37 @@ LOAD_FIXTURES = [
 ]
 
 
+# scripts/new-observation.sh, the create command: its archival sweep moves
+# a resolved entry before the id is read. (name, header of 0001-a.md, archived?)
+# A file the sweep cannot read stays in the active set and costs tokens in
+# every session's scan. TODAY is replaced with the date the script will see.
+CREATE_SCRIPT = pathlib.Path(__file__).resolve().parent / "new-observation.sh"
+CREATE_FIXTURES = [
+    ("a resolved entry from an earlier day is archived",
+     "---\nid: 1\nstatus: actioned\nresolved: 2000-01-01\n---\n", True),
+    ("a CRLF header is archived: a Windows checkout writes CRLF",
+     "---\r\nid: 1\r\nstatus: actioned\r\nresolved: 2000-01-01\r\n---\r\n", True),
+    ("a quoted status and date are archived: skill-load reads both forms",
+     "---\nid: 1\nstatus: \"declined\"\nresolved: '2000-01-01'\n---\n", True),
+    ("an entry resolved today stays until the next day",
+     "---\nid: 1\nstatus: superseded\nresolved: TODAY\n---\n", False),
+    ("an open entry stays", "---\nid: 1\nstatus: open\nresolved: 2000-01-01\n---\n", False),
+]
+
+
+def create_case(header):
+    import datetime
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp) / "work space"
+        log = root / "skill-observations" / "observation-log"
+        (log / "archive").mkdir(parents=True)
+        (log / "0001-a.md").write_bytes(header.replace("TODAY", datetime.date.today().isoformat()).encode())
+        r = subprocess.run(["bash", str(CREATE_SCRIPT), "probe", str(root)], cwd=tmp, capture_output=True,
+                           text=True, encoding="utf-8", errors="replace")
+        return r.returncode, r.stdout, (log / "archive" / "0001-a.md").is_file()
+
+
 # scripts/ref-section.sh, the reader for a pointer that names a section:
 # (name, heading, exit status, output substring, output substring that must
 # be ABSENT). A section loaded short of its text is a rule silently skipped,
@@ -1613,6 +1644,13 @@ def selftest():
     elif shutil.which("bash"):
         bad += 1; total += 1
         print(f"FAIL skill-load script: {LOAD_SCRIPT.name} missing beside this file")
+    if shutil.which("bash") and CREATE_SCRIPT.is_file():
+        for name, header, want_archived in CREATE_FIXTURES:
+            rc, out, archived = create_case(header)
+            ok = rc == 0 and out.strip().endswith("0002-probe.md") and archived == want_archived
+            bad += not ok; total += 1
+            print(f"{'ok  ' if ok else 'FAIL'} create script: {name}"
+                  + ("" if ok else f" (exit {rc}, archived {archived}, out {out!r})"))
     if shutil.which("bash") and SECTION_SCRIPT.is_file():
         ok = subprocess.run(["bash", "-n", str(SECTION_SCRIPT)]).returncode == 0
         bad += not ok; total += 1
