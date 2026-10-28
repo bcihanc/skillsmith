@@ -100,7 +100,8 @@ fi
 # review's OPEN set: any status other than actioned, declined, superseded or
 # parked, a missing status included. `skill:` and `target_file:` are read in
 # all three shapes the log uses: an inline [a, "b"] list, a plain scalar,
-# and a block list of `- a` lines below it. bare() strips a plugin
+# and a block list of `- a` lines below it, indented or at column 0 (PyYAML
+# writes the latter, and the scan's digest reads both). bare() strips a plugin
 # qualifier and a path, so both fields compare on the last segment.
 prog='function bare(t) { sub(/.*:/, "", t); sub(/.*\//, "", t); return t }
   function tok(t) {
@@ -114,7 +115,7 @@ prog='function bare(t) { sub(/.*:/, "", t); sub(/.*\//, "", t); return t }
                     inl = (v ~ /^[[:space:]]*$/); gsub(/[][]/, "", v)
                     n = split(v, a, ","); for (i = 1; i <= n; i++) if (tok(a[i])) sk = 1
                     next }
-  fm && inl && /^[[:space:]]+-[[:space:]]/ { v = $0; sub(/^[[:space:]]+-[[:space:]]*/, "", v); if (tok(v)) sk = 1; next }
+  fm && inl && /^[[:space:]]*-[[:space:]]/ { v = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", v); if (tok(v)) sk = 1; next }
   fm && /^[A-Za-z_]/ { inl = 0 }
   fm && /^status:[[:space:]]*["\047]?(actioned|declined|superseded|parked)["\047]?[[:space:]]*(#.*)?$/ { rs = 1 }'
 

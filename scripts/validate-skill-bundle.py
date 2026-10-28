@@ -1282,6 +1282,9 @@ LOAD_FIXTURES = [
      "reviewer.md: 1 open observations\n0005-e.md", 1),
     ("the bare skill name does not match the file name", "reviewer", True, 0,
      "reviewer: 1 open observations\n0006-f.md", 1),
+    # PyYAML writes a block list at column 0; a reader that wants it indented
+    # reports a clean zero for an open entry
+    ("a block list at column 0 is read", "zeta", True, 0, "zeta: 1 open observations\n0007-g.md", 1),
     ("no log yet: one NOTE line, exit 0, nothing written", "foo", True, 0,
      "NOTE: foo: no observation log yet at ", 0, "nolog"),
 ]
@@ -1354,7 +1357,8 @@ def load_case(skill, absolute, scenario=""):
                                   ("0003-c.md", "skill: foo\nstatus: actioned", ""),
                                   ("0004-d.md", "skill: [bar]\nstatus: open", "skill: foo\n"),
                                   ("0005-e.md", "skill: []\ntarget_file: [.claude/agents/reviewer.md]\nstatus: open", ""),
-                                  ("0006-f.md", "skill: [reviewer]\nstatus: open", "")]:
+                                  ("0006-f.md", "skill: [reviewer]\nstatus: open", ""),
+                                  ("0007-g.md", "skill:\n- zeta\n-\tother\nstatus: open", "")]:
                 (log / f).write_text(f"---\nid: 1\n{head}\n---\n{body}", encoding="utf-8")
         arg = str(root) if absolute else os.path.relpath(root, tmp)
         r = subprocess.run(["bash", str(LOAD_SCRIPT), arg, skill], cwd=tmp, capture_output=True,
