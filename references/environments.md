@@ -526,12 +526,12 @@ skip the third. A backstop written in the medium of the rule it guards is
 one layer, not two. The second layer has to hang on an event the harness
 raises, not on the agent re-reading its instructions: where the harness
 offers a stop or turn-end hook, the objective check is cheap — a turn did
-a multi-step task, and nothing under `observation-log/` or
-`checkpoints.log` has been written since the session started — block once,
-with a one-line instruction, and stay silent otherwise. Classify each
-enforcement layer by what it needs in order to function: a filesystem
-write survives into any session type, a prose reminder survives only while
-the prose is being acted on.
+a multi-step task, and since the session started no observation file and
+no dated `checkpoints.log` line but a skill load's has been written —
+block once, with a one-line instruction, and stay silent otherwise.
+Classify each enforcement layer by what it needs in order to function: a
+filesystem write survives into any session type, a prose reminder survives
+only while the prose is being acted on.
 
 A third belt: the scan's `checkpoints.log` line (`observation-log.md`,
 "The scan ends in a write, not only a print").
@@ -622,12 +622,12 @@ The per-task backstop fails with the block it lives in (above): a session
 that skipped the protocol skipped the backstop at every task boundary too.
 Where the harness has a stop event, run the check there instead: *has the
 turn just ending done a multi-step task (three or more tool uses since the
-user's last message, or a file write), and has anything under
-`observation-log/` or `checkpoints.log` been written since the session
-started?* If not, block the stop once per session with a one-line
-instruction; stay silent for conversation, for a session that already
-wrote, for a second block in a row, and when the log cannot be read. Node,
-no dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
+user's last message, or a file write), and since the session started, has
+an observation file been written, or a dated `checkpoints.log` line other
+than a skill load's `loaded` one?* If not, block the stop once per session
+with a one-line instruction; stay silent for conversation, for a session
+that already wrote, for a second block in a row, and when the log cannot
+be read. Node, no dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
 
 ```js
 // Stop hook: the per-task backstop as a harness event instead of prose.
@@ -670,17 +670,20 @@ if (!(started > 0)) block('skillsmith backstop: cannot tell when this session st
   'transcript timestamp), so it cannot check the log. Check by hand that this session wrote an observation ' +
   'or a checkpoints.log line, and report the one-line summary. Fires once per session.');
 
-const files = [path.join(base, 'checkpoints.log')];
+const files = [];
 try {
   for (const n of fs.readdirSync(path.join(base, 'observation-log')))
     if (n.endsWith('.md')) files.push(path.join(base, 'observation-log', n));
 } catch { process.exit(0); }                             // unreachable log: stay silent
-const touched = files.some((f) => { try { return fs.statSync(f).mtimeMs > started; } catch { return false; } });
-if (touched) process.exit(0);
+const t0 = new Date(started); t0.setSeconds(0, 0);       // log lines carry the minute, local time
+let lines = []; try { lines = fs.readFileSync(path.join(base, 'checkpoints.log'), 'utf8').split('\n'); } catch {}
+const logged = lines.some((l) => { const m = l.match(/^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d) (.*)/);  // a load's line is not activation
+  return m && !/^loaded /.test(m[6]) && new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]) >= t0; });
+if (logged || files.some((f) => { try { return fs.statSync(f).mtimeMs > started; } catch { return false; } })) process.exit(0);
 
-block('skillsmith backstop: this session used tools but wrote no observation file and no checkpoint line. ' +
+block('skillsmith backstop: this session did a multi-step task but wrote no observation file and no checkpoint line beyond a skill load. ' +
   'If the skill was never invoked, invoke it now; then write pending observations or append a ' +
-  '"no observations" line to checkpoints.log, and report the one-line summary. Fires once per session.');
+  'dated "YYYY-MM-DD HH:MM no observations" line to checkpoints.log, and report the one-line summary. Fires once per session.');
 ```
 
 **The session's start time is the fragile input.** A transcript's birth
@@ -692,18 +695,20 @@ earlier than the change time; otherwise the hook reads the first
 `"timestamp"` in the transcript, and where neither exists it blocks once
 with a request to check by hand rather than falling silent.
 
-Its known limits: it compares modification times, so a parallel session
-writing to the same log reads as this session's write (a missed block,
-never a false one); it fires for the main agent only, so a subagent —
-which by the activation block writes nothing — is never blocked, and a
-harness that runs the hook for a subagent whose caller owns its output
-must not wire it there ("Sessions whose output channel is owned by a
-caller"); it counts one turn at a time, so a task spread over turns of one
-or two tool uses each, none a write, is never blocked; and like every
-trigger, it is armed only once it has matched the real event — run it
-against a transcript with tool calls and no write, then against the same
-with a checkpoint line appended and the transcript appended to after it (a
-start time read from the change time blocks that one), before trusting
+Its known limits: a log line counts only by its `YYYY-MM-DD HH:MM` stamp,
+so an undated acknowledgement draws the one block; it compares
+modification times, so a parallel session writing to the same log reads as
+this session's write (a missed block, never a false one); it fires for the
+main agent only, so a subagent — which by the activation block writes
+nothing — is never blocked, and a harness that runs the hook for a
+subagent whose caller owns its output must not wire it there ("Sessions
+whose output channel is owned by a caller"); it counts one turn at a time,
+so a task spread over turns of one or two tool uses each, none a write, is
+never blocked; and like every trigger, it is armed only once it has
+matched the real event — run it against a transcript with tool calls and
+no write, then with only a `loaded` line (it must still block), then with
+a dated checkpoint line appended and the transcript appended to after it
+(a start time read from the change time blocks that one), before trusting
 either outcome.
 
 ### A pre-tool hook — the only write path as a barrier
