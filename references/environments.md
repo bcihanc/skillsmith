@@ -1820,9 +1820,11 @@ A cloud or scheduled run can have a filesystem of its own and no route to
 the workspace: the probe fails, and no folder-picker or device-bridge tool
 is on the tool surface — absent, not denied. Check once with a tool
 search; if none appears, the request-and-retry branch of Session Start
-step 1 has nothing to call, so skip it. The same file is the landing
-place when the folder request was refused and the one permitted retry was
-refused too.
+step 1 has nothing to call, so skip it. The same file is the landing place
+when the folder request was refused and the one permitted retry was
+refused too, or a write to the log was denied (SKILL.md, How to Log). A
+worker with a coordinator carries the observations in its report instead:
+report-back mode ("Anchoring the workspace").
 
 **Fallback order when the log is unreachable.** (a) The observation log.
 (b) A user-scoped store this surface can write and every other surface
