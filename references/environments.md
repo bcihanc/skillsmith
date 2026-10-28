@@ -149,18 +149,18 @@ skill that never loads cannot announce that it was relevant.
 ```text
 (skillsmith activation block — template of v4.0.0)
 Before the first tool call of any multi-step task — three or more tool
-calls, a file write, or a plan, and before proposing that plan, not
-merely before executing it — invoke the skillsmith skill AND execute
-its Session Start Protocol (storage check, frontmatter scan, review
-trigger). Loading the skill and running the protocol are separate steps;
-a session that loads the file and stops has activated nothing. A plain
-question or a one- or two-call lookup does not count; when unsure, it
-counts, and a session that grows into such a task invokes the skill on
-the turn it does, as does a user correction of how you work.
-Once the skill is invoked, a protocol step you did not run is reported
-before the answer, in one line — never after it, where it reads as a
-suggestion. If the skill does not resolve on this turn, say which probe
-told you so (the skill listing, or the skill directory on disk),
+calls, a file write, or a plan, and before writing or proposing that
+plan, not merely before executing it — invoke the skillsmith skill AND
+execute its Session Start Protocol (storage check, frontmatter scan,
+review trigger). Loading the skill and running the protocol are separate
+steps; a session that loads the file and stops has activated nothing. A
+plain question or a one- or two-call lookup does not count; when unsure,
+it counts, and a session that grows into such a task invokes the skill
+on the turn it does, as does a user correction of how you work. Once the
+trigger holds, a step you did not run, the invocation included, is
+reported before the answer, in one line — never after it, where it reads
+as a suggestion. If the skill does not resolve on this turn, say which
+probe told you so (the skill listing, or the skill directory on disk),
 re-check the listing on every later turn of a multi-step task, and run
 the protocol the first time it resolves — a "not installed" verdict
 holds for one turn.

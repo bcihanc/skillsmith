@@ -163,10 +163,10 @@ proprietary client information to be useful in an open-source skill
 Active for the entire task session: execution, post-task feedback and
 review discussion, meta-discussion about skills or methodology, and
 reflective or strategy conversations about how work should be done. The
-observation mindset does not deactivate when the conversation shifts from
-doing the work to discussing it — user feedback in review phases is often
-the highest-signal input. Inactive only for casual conversation and quick
-factual questions with no tools or deliverables involved.
+observation mindset does not deactivate when the conversation shifts
+from doing the work to discussing it — user feedback in review phases is
+often the highest-signal input. When it is inactive: SKILL.md, "When to
+Observe".
 
 ## Deferral disguised as diligence
 

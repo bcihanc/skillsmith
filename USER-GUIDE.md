@@ -89,7 +89,7 @@ It is always your own decision if you want to open-source any of your skills at 
 
 ## The weekly review (now possible via scheduled tasks)
 
-The skill has a built-in weekly review cycle. If more than 7 days have passed since the last review and there are open observations waiting, Claude will offer to run a comprehensive review at the start of your next task-oriented session. It's a one-line offer, not an interruption: you can run the review right away or carry on with your task and let a later session (or a scheduled run) handle it.
+The skill has a built-in weekly review cycle. If more than 7 days have passed since the last review and there are open observations waiting, Claude will offer to run a comprehensive review at the start of your next multi-step task. It's a one-line offer, not an interruption: you can run the review right away or carry on with your task and let a later session (or a scheduled run) handle it.
 
 What to expect when the review runs: Claude cross-checks all open observations against all your skills, checks whether cross-cutting principles are being followed everywhere, applies the improvements it can, and presents you with a summary of what changed and what needs your attention. It's thorough: the review covers your entire skill library, not just the skills mentioned in individual observations.
 
