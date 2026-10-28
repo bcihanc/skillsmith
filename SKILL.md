@@ -332,14 +332,14 @@ to `skill-observations/checkpoints.log`: a remembered "ask whether" is not
 enforcement. Roughly every third completion is the rule. (Exception for a
 priced-write workspace: `references/environments.md` ("Storage regimes").)
 
-**A denied or failed write is not a read-only log.** A transient failure
-(an I/O error, a timeout, a tool error with no permission decision) gets
-one retry. A permission or classifier denial is authoritative: tell the
-user in one line what was denied and why the write mattered, then carry
-the observations in report-back or handoff mode (`references/environments.md`).
-A classifier denial gets at most one identical retry, told to the user as a
-check for a false negative — never a different tool. A mode that refuses
-every write by design is neither: defer, don't retry
+**A denied or failed write is not a read-only log.** A transient failure (an
+I/O error, a timeout, a tool error with no permission decision) gets one retry.
+A permission or classifier denial is authoritative: tell the user in one line
+what was denied and why the write mattered, then carry the observations in
+report-back or handoff mode (`references/environments.md`, "No link to the
+user's computer"). A classifier denial gets at most one identical retry, told
+to the user as a check for a false negative — never a different tool. A mode
+that refuses every write by design is neither: defer, don't retry
 (`references/environments.md`, "A mode that forbids every write by design").
 
 **Deliverable-event flush.** Whenever a unit of work is declared complete to
