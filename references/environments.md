@@ -522,16 +522,16 @@ post-task check.
 
 That check is prose in the same file as the rule it guards, and it fails
 with it: whatever made a session skip the block's first paragraph makes it
-skip the third. A backstop written in the medium of the rule it
-guards is one layer, not two. The second layer has to hang on an event
-the harness raises, not on the agent re-reading its instructions: where
-the harness offers a stop or turn-end hook, the objective check is cheap —
-the session used tools, and nothing under `observation-log/` or
-`checkpoints.log` has been written since it started — block once, with a
-one-line instruction, and stay silent otherwise. Classify each
+skip the third. A backstop written in the medium of the rule it guards is
+one layer, not two. The second layer has to hang on an event the harness
+raises, not on the agent re-reading its instructions: where the harness
+offers a stop or turn-end hook, the objective check is cheap — a turn did
+a multi-step task, and nothing under `observation-log/` or
+`checkpoints.log` has been written since the session started — block once,
+with a one-line instruction, and stay silent otherwise. Classify each
 enforcement layer by what it needs in order to function: a filesystem
-write survives into any session type, a prose reminder survives only
-while the prose is being acted on.
+write survives into any session type, a prose reminder survives only while
+the prose is being acted on.
 
 A third belt: the scan's `checkpoints.log` line (`observation-log.md`,
 "The scan ends in a write, not only a print").
@@ -698,11 +698,13 @@ never a false one); it fires for the main agent only, so a subagent —
 which by the activation block writes nothing — is never blocked, and a
 harness that runs the hook for a subagent whose caller owns its output
 must not wire it there ("Sessions whose output channel is owned by a
-caller"); and like every trigger, it is armed only once it has matched the
-real event — run it against a transcript with tool calls and no write,
-then against the same with a checkpoint line appended and the transcript
-appended to after it (a start time read from the change time blocks that
-one), before trusting either outcome.
+caller"); it counts one turn at a time, so a task spread over turns of one
+or two tool uses each, none a write, is never blocked; and like every
+trigger, it is armed only once it has matched the real event — run it
+against a transcript with tool calls and no write, then against the same
+with a checkpoint line appended and the transcript appended to after it (a
+start time read from the change time blocks that one), before trusting
+either outcome.
 
 ### A pre-tool hook — the only write path as a barrier
 
