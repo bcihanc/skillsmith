@@ -458,8 +458,8 @@ load a body only when you actually action that observation in Step 5. This
 frontmatter-first pass is what keeps the review cheap as the backlog grows.
 
 Build the work queue from the files themselves, not from a status filter.
-The OPEN set is defined as: **`status` is literally `open`, OR the file has
-no `status` field at all.** Concretely:
+The OPEN set is **every file not `actioned`, `declined`, `superseded` or
+`parked`**, a missing status included. Concretely:
 
 1. Enumerate every file in `observation-log/` — the directory listing is the
    authoritative list of entries.
