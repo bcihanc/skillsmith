@@ -8,5 +8,5 @@ migration.md 262 2026-10-16 the test branch: the split store, a log.md beside th
 observation-log.md 1451
 signals.md 234
 skill-authoring.md 1439 2026-10-26 editing rule 4 covers the install copy list, the LICENSE is the unmodified legal text with the credit line in the README
-starter-principles.md 505 2026-10-27 the reconciliation says it reads every entry, since step 1 now loads the Reconciliation section alone
+starter-principles.md 507 2026-10-28 the Reconciliation section says where its version and its entry count N come from, since it is loaded without the file's top
 weekly-review.md 2201 2026-10-27 Steps 0-8 are headings, as the Contents lists them, so the staged-work gate section ends at Step 2 instead of running to Constraints
