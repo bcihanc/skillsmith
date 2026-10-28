@@ -620,14 +620,14 @@ that never fires and one correctly silent look identical otherwise.
 
 The per-task backstop fails with the block it lives in (above): a session
 that skipped the protocol skipped the backstop at every task boundary too.
-Where the harness has a stop event, run the check there instead: *has
-the turn just ending done a multi-step task (three or more tool uses
-since the user's last message, or a file write), and has anything under
-`observation-log/` or `checkpoints.log` been written since it started?*
-If not, block the stop once per session with a one-line instruction;
-stay silent for conversation, for a session that already wrote, for a
-second block in a row, and when the log cannot be read. Node, no
-dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
+Where the harness has a stop event, run the check there instead: *has the
+turn just ending done a multi-step task (three or more tool uses since the
+user's last message, or a file write), and has anything under
+`observation-log/` or `checkpoints.log` been written since the session
+started?* If not, block the stop once per session with a one-line
+instruction; stay silent for conversation, for a session that already
+wrote, for a second block in a row, and when the log cannot be read. Node,
+no dependencies; substitute `[ABSOLUTE PATH]` as elsewhere:
 
 ```js
 // Stop hook: the per-task backstop as a harness event instead of prose.
