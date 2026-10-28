@@ -342,13 +342,13 @@ check for a false negative — never a different tool. A mode that refuses
 every write by design is neither: defer, don't retry
 (`references/environments.md`, "A mode that forbids every write by design").
 
-**Deliverable-event flush.** Whenever a unit of work is declared complete
-to a human — a file handed over, a render, a staged skill file, a
-completion notification, a final report, a finished todo batch — write any
-pending observation files at that moment; the flush rides on a tool call
-you were making anyway. (Why both checkpoints are writes rather than
-questions, and why a finding met while resolving another observation gets
-its own file: `references/observation-log.md`.)
+**Deliverable-event flush.** Whenever a unit of work is declared complete to
+a human — a file handed over, a render, a staged skill file, a completion
+notification, a final report, a finished todo batch — write any pending
+observation files at that moment; the flush rides on a tool call you were
+making anyway. A finding met while resolving another observation gets its
+own file; why this and both checkpoints: `references/observation-log.md`,
+"Why the checkpoints are writes, not questions".
 
 **A failed write to an external system is a flush trigger in its own
 right** — a tool result carrying `permission stream closed`, `permission
@@ -662,9 +662,9 @@ in its `skill:` list. Full protocol: `references/observation-log.md`
 ## Feedback on this skill
 
 If the user has methodology feedback, offer to draft a report for
-github.com/bcihanc/skillsmith, running the feedback
-pre-flight in `references/skill-authoring.md` first; if the problem is the
-agent not following the skill's rules, acknowledge and correct it instead.
+github.com/bcihanc/skillsmith, running the feedback pre-flight in
+`references/skill-authoring.md` ("Author Attribution Template") first; if
+the agent broke the skill's rules, acknowledge and correct that instead.
 
 ## Quick Reference
 
