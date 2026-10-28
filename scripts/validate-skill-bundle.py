@@ -819,32 +819,40 @@ def check_plugin_manifest(skill_dir, fails):
 # and the SKILL.md id snippet, kept for installs that ship SKILL.md alone. A fix
 # made to one copy leaves the other silently wrong, so the two are compared line
 # by line, with comments, indentation and the core's `$ 2` spacing (see
-# template_tokens) left out. A part missing from either copy is a difference:
-# a renamed line must not turn the check blind.
+# template_tokens) left out. Line breaks count: in awk a newline ends a statement
+# where a space concatenates. The core's copy is the fenced snippet holding the
+# sweep, so a line elsewhere in SKILL.md is never read as it. A part missing from
+# either copy is a difference: a renamed line must not turn the check blind.
 SWEEP_AWK = "the archival sweep's awk program"
+SWEEP_MOVE = "the archive move"
 SWEEP_KEYS = ("n_files=", "seen=", "floor=", "ids=", "hi=", "next_id=")
 SWEEP_AWK_RE = re.compile(r"""LC_ALL=C awk -v today="\$today" '(.*?)' \[0-9\]\*\.md""", re.S)
+SWEEP_MOVE_RE = re.compile(r'mv -\S+ "\$x" archive/')   # -n: never over an archived file
+SNIPPET_RE = re.compile(r"(?ms)^```bash\n(.*?)^```")
 
 
 def _sweep_norm(s):
-    s = re.sub(r"(?m)[ \t]+#[ \t].*$", "", s)
-    return " ".join(re.sub(r"\$ (?=[0-9])", "$", s).split())
+    s = re.sub(r"(?m)[ \t]+#[ \t].*$", "", re.sub(r"\$ (?=[0-9])", "$", s))
+    return "\n".join(l.strip() for l in s.splitlines() if l.strip())
 
 
 def sweep_parts(text):
-    m = SWEEP_AWK_RE.search(text)
+    m, mv = SWEEP_AWK_RE.search(text), SWEEP_MOVE_RE.search(text)
     parts = {SWEEP_AWK: _sweep_norm(m.group(1))} if m else {}
+    if mv:
+        parts[SWEEP_MOVE] = mv.group(0)
     for line in text.splitlines():
         line = line.strip()
         for k in SWEEP_KEYS:
             if line.startswith(k):
-                parts.setdefault(k, _sweep_norm(line))
+                parts.setdefault(k, _sweep_norm(line))   # the first: a later `next_id=` steps past a claimed id
     return parts
 
 
 def sweep_copy_diffs(core, script):
-    a, b = sweep_parts(core), sweep_parts(script)
-    return [k for k in (SWEEP_AWK,) + SWEEP_KEYS if a.get(k) is None or a.get(k) != b.get(k)]
+    snippet = next((b for b in SNIPPET_RE.findall(core) if SWEEP_AWK_RE.search(b)), "")
+    a, b = sweep_parts(snippet), sweep_parts(script)
+    return [k for k in (SWEEP_AWK, SWEEP_MOVE) + SWEEP_KEYS if a.get(k) is None or a.get(k) != b.get(k)]
 
 
 def check_dir(skill_dir, fails):
@@ -1542,15 +1550,21 @@ POINTER_FIXTURES = [
      'See `references/a.md` and `x` ("Not a target").\n', {}, {"a.md": 1}),
 ]
 
-_SWEEP_CORE = ("n_files=$(find a)   # core note\nseen=$(b)\n"
+_SWEEP_CORE = ("hi=5 is prose, outside the snippet\n```bash\n"
+               "n_files=$(find a)   # core note\nseen=$(b)\n"
                "( cd \"$d\" && LC_ALL=C awk -v today=\"$today\" 'FNR==1 {st=$ 2}   # spaced\n"
-               "    fm {r=$ 2}' [0-9]*.md | while read x; do :; done )\n"
-               "floor=1\nids=2\nhi=$((10#${hi:-0}))\nnext_id=4\n")
-_SWEEP_SCRIPT = _SWEEP_CORE.replace("$ 2", "$2").replace("# core note", "# script note") \
-    .replace("ids=2", "  ids=2").replace("do :; done", "do mv x y; done")
+               "    fm {r=$ 2}' [0-9]*.md | while read x; do mv -n \"$x\" archive/; done )\n"
+               "floor=1\nids=2\nhi=$((10#${hi:-0}))\nnext_id=4\n```\n")
+_SWEEP_SCRIPT = ("n_files=$(find a)   # script note\nseen=$(b)\n"
+                 "( cd \"$d\" && LC_ALL=C awk -v today=\"$today\" 'FNR==1 {st=$2}\n"
+                 "      fm {r=$2}' [0-9]*.md | while read x; do mv -n \"$x\" archive/; echo NOTE; done )\n"
+                 "floor=1\n  ids=2\nhi=$((10#${hi:-0}))\nnext_id=4\n  next_id=$((next_id + 1))\n")
 SWEEP_FIXTURES = [
-    ("comments, indentation, `$ 2` and the mv loop do not count", _SWEEP_SCRIPT, []),
+    ("comments, indentation, `$ 2`, the loop's messages and a line outside the snippet do not count",
+     _SWEEP_SCRIPT, []),
     ("a changed sweep filter is caught", _SWEEP_SCRIPT.replace("{r=$2}", "{r=$2; gsub(/x/, \"\", r)}"), [SWEEP_AWK]),
+    ("two awk lines joined into one are caught", _SWEEP_SCRIPT.replace("{st=$2}\n      fm", "{st=$2} fm"), [SWEEP_AWK]),
+    ("an archive move that may overwrite is caught", _SWEEP_SCRIPT.replace("mv -n", "mv -f"), [SWEEP_MOVE]),
     ("a changed id line is caught", _SWEEP_SCRIPT.replace("hi=$((10#", "hi=$(("), ["hi="]),
     ("a copy that lacks a line is caught", _SWEEP_SCRIPT.replace("floor=1\n", ""), ["floor="]),
 ]
