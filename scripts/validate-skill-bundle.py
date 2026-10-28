@@ -815,6 +815,38 @@ def check_plugin_manifest(skill_dir, fails):
             "validates it there.")
 
 
+# The archival sweep and the id derivation exist twice: scripts/new-observation.sh
+# and the SKILL.md id snippet, kept for installs that ship SKILL.md alone. A fix
+# made to one copy leaves the other silently wrong, so the two are compared line
+# by line, with comments, indentation and the core's `$ 2` spacing (see
+# template_tokens) left out. A part missing from either copy is a difference:
+# a renamed line must not turn the check blind.
+SWEEP_AWK = "the archival sweep's awk program"
+SWEEP_KEYS = ("n_files=", "seen=", "floor=", "ids=", "hi=", "next_id=")
+SWEEP_AWK_RE = re.compile(r"""LC_ALL=C awk -v today="\$today" '(.*?)' \[0-9\]\*\.md""", re.S)
+
+
+def _sweep_norm(s):
+    s = re.sub(r"(?m)[ \t]+#[ \t].*$", "", s)
+    return " ".join(re.sub(r"\$ (?=[0-9])", "$", s).split())
+
+
+def sweep_parts(text):
+    m = SWEEP_AWK_RE.search(text)
+    parts = {SWEEP_AWK: _sweep_norm(m.group(1))} if m else {}
+    for line in text.splitlines():
+        line = line.strip()
+        for k in SWEEP_KEYS:
+            if line.startswith(k):
+                parts.setdefault(k, _sweep_norm(line))
+    return parts
+
+
+def sweep_copy_diffs(core, script):
+    a, b = sweep_parts(core), sweep_parts(script)
+    return [k for k in (SWEEP_AWK,) + SWEEP_KEYS if a.get(k) is None or a.get(k) != b.get(k)]
+
+
 def check_dir(skill_dir, fails):
     # Resolve before comparing names: Path('.').name is '' for a relative
     # argument naming the current directory, which false-fails a correct
@@ -926,6 +958,11 @@ def check_dir(skill_dir, fails):
     check_core_size(skill_md, fails)
     check_reference_indexes(skill_dir, fails)
     check_plugin_manifest(skill_dir, fails)
+    create = skill_dir / "scripts" / "new-observation.sh"
+    if create.is_file():
+        for k in sweep_copy_diffs(text, create.read_text(encoding="utf-8")):
+            fails.append(f"SKILL.md id snippet and scripts/{create.name} differ on {k} "
+                         f"(or one copy lacks it) — change both copies")
     for p in skill_dir.rglob("*"):
         parts = p.relative_to(skill_dir).parts
         if any(part in VCS_DIRS for part in parts):
@@ -1505,6 +1542,19 @@ POINTER_FIXTURES = [
      'See `references/a.md` and `x` ("Not a target").\n', {}, {"a.md": 1}),
 ]
 
+_SWEEP_CORE = ("n_files=$(find a)   # core note\nseen=$(b)\n"
+               "( cd \"$d\" && LC_ALL=C awk -v today=\"$today\" 'FNR==1 {st=$ 2}   # spaced\n"
+               "    fm {r=$ 2}' [0-9]*.md | while read x; do :; done )\n"
+               "floor=1\nids=2\nhi=$((10#${hi:-0}))\nnext_id=4\n")
+_SWEEP_SCRIPT = _SWEEP_CORE.replace("$ 2", "$2").replace("# core note", "# script note") \
+    .replace("ids=2", "  ids=2").replace("do :; done", "do mv x y; done")
+SWEEP_FIXTURES = [
+    ("comments, indentation, `$ 2` and the mv loop do not count", _SWEEP_SCRIPT, []),
+    ("a changed sweep filter is caught", _SWEEP_SCRIPT.replace("{r=$2}", "{r=$2; gsub(/x/, \"\", r)}"), [SWEEP_AWK]),
+    ("a changed id line is caught", _SWEEP_SCRIPT.replace("hi=$((10#", "hi=$(("), ["hi="]),
+    ("a copy that lacks a line is caught", _SWEEP_SCRIPT.replace("floor=1\n", ""), ["floor="]),
+]
+
 
 def selftest():
     bad = total = 0
@@ -1522,6 +1572,11 @@ def selftest():
         bad += not ok; total += 1
         print(f"{'ok  ' if ok else 'FAIL'} core pointer: {name}"
               + ("" if ok else f" (named {named}, filename-only {unnamed})"))
+    for name, script, want in SWEEP_FIXTURES:
+        got = sweep_copy_diffs(_SWEEP_CORE, script)
+        ok = got == want
+        bad += not ok; total += 1
+        print(f"{'ok  ' if ok else 'FAIL'} sweep copies: {name}" + ("" if ok else f" (differ on {got})"))
     for name, text, must_fail in RESIDUE_FIXTURES:
         failed = bool(residue_hits(pathlib.Path("fixture.md"), text))
         ok = failed == must_fail
