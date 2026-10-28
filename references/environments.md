@@ -562,12 +562,12 @@ and inject it rather than asking the agent to go and look:
 #!/bin/sh
 # SessionStart hook: inject activation + review state as additionalContext.
 d="$OBS_WORKSPACE/skill-observations"      # the pinned absolute path
-open=$(find "$d/observation-log" -maxdepth 1 -name '*.md' -exec grep -l '^status: open$' {} + 2>/dev/null | wc -l | tr -d ' ')
+open=$(find "$d/observation-log" -maxdepth 1 -name '[0-9]*.md' -exec awk 'FNR==1 {sub(/^\357\273\277/, ""); fm=/^---[[:space:]]*$/; if (!fm) {print; nextfile}; next} fm && /^---[[:space:]]*$/ {print; nextfile} fm && /^status:/ {v=$2; gsub(/["\047\r]/, "", v); if (v !~ /^(actioned|declined|superseded|parked)$/) print; nextfile}' {} + 2>/dev/null | wc -l | tr -d ' ')   # a line per OPEN entry: a missing, quoted or CRLF status still reads
 last=$(tr -d '\r' 2>/dev/null < "$d/last-review-date.txt"); last=${last:-never}   # a CRLF file must not carry \r into the JSON
 msg="Before the first tool call of a multi-step task (three or more tool calls, a file write, or a plan), make that call one batched call that both lists the skillsmith workspace ($OBS_WORKSPACE) and invokes the skillsmith skill; then run its Session Start Protocol. Observation files are created only by scripts/new-observation.sh in the skill directory, never by copying a header."
 msg="$msg $open open observations in $d; last review: $last."   # always, zero included: a mispinned path reads 0 too
 if [ "$open" -gt 0 ]; then
-  cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F)   # GNU, then BSD/macOS
+  cutoff=$(date -d '7 days ago' +%F 2>/dev/null || date -v-7d +%F 2>/dev/null || date -d "@$(( $(date +%s) - 604800 ))" +%F)   # GNU, BSD/macOS, then busybox
   case "$last" in
     (never) msg="$msg Offer the review." ;;
     (*) [ "$(printf '%s\n%s\n' "$last" "$cutoff" | sort | head -1)" = "$last" ] && msg="$msg Offer the review." ;;
@@ -598,23 +598,23 @@ Microsoft Store stub under `WindowsApps`, and neither runs the hook.
 Register the hook with the interpreter's full path (for Python, `py -0p`
 lists the real installs; skip any `WindowsApps` path).
 
-The count is of files whose `status` field reads `open` — not of files
-in the directory. Resolved entries deliberately stay in `observation-log/`
-until the day after they were resolved (the grace period lives in the
-file, not in session memory), and parked entries are decided and out of
-the work queue, so a raw file count overstates the backlog by every entry
-the last review just closed, for a day, in every session. Compare dates
-without `<` in `[ ]`: ISO dates sort lexically, so
+The count is of entries not resolved or parked (the review's OPEN set),
+not of files in the directory. Resolved entries deliberately stay in
+`observation-log/` until the day after they were resolved (the grace
+period lives in the file, not in session memory), and parked entries are
+decided and out of the work queue, so a raw file count overstates the
+backlog by every entry the last review just closed, for a day, in every
+session. Compare dates without `<` in `[ ]`: ISO dates sort lexically, so
 `[ "$(printf '%s\n%s\n' "$last" "$cutoff" | sort | head -1)" = "$last" ]`
 is true when `$last` is not later than `$cutoff`, in every POSIX shell
 (`\<` is a bash/ksh extension that zsh rejects and `sh` does not know).
-Two details that matter when building one: `grep -c` exits 1
-on zero matches while still printing `0`, so `$(grep -c … || echo 0)`
-yields two values — capture the output and ignore the exit code; and prove
-the reminder branch fires by running the hook against fixtures at `never`,
-30 days stale, 2 days stale and an empty log, confirming the third stays
-silent and the fourth still prints "0 open observations in <path>" — a
-nag that never fires and one correctly silent look identical otherwise.
+Two details that matter when building one: `grep -c` exits 1 on zero
+matches while still printing `0`, so `$(grep -c … || echo 0)` yields two
+values — capture the output and ignore the exit code; and prove the
+reminder branch fires by running the hook against fixtures at `never`, 30
+days stale, 2 days stale and an empty log, confirming the third stays
+silent and the fourth still prints "0 open observations in <path>" — a nag
+that never fires and one correctly silent look identical otherwise.
 
 ### A stop hook — the per-task backstop as a harness event
 
